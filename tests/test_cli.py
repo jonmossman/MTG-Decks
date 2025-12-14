@@ -1,12 +1,11 @@
 from pathlib import Path
 
-from pathlib import Path
-
 import pytest
 
 from mtg_decks import __version__, cli
 from mtg_decks import importer as importer_module
 from mtg_decks.library import DeckLibrary
+from mtg_decks.valuation import DeckValuation
 
 
 @pytest.fixture()
@@ -90,8 +89,8 @@ def test_cli_import_creates_deck_and_reports_warnings(
             self.mapping = {
                 "sol rng": importer_module.CardData(name="Sol Ring"),
                 "Arcane Signet": importer_module.CardData(name="Arcane Signet"),
-                "Atraxa": importer_module.CardData(
-                    name="Atraxa, Praetors' Voice", color_identity=["W", "U", "B", "G"]
+                "Cloud": importer_module.CardData(
+                    name="Cloud, Ex-SOLDIER", color_identity=["W", "U", "B", "G"]
                 ),
             }
 
@@ -109,7 +108,7 @@ def test_cli_import_creates_deck_and_reports_warnings(
             str(deck_dir),
             "import",
             "Imported Deck",
-            "Atraxa",
+            "Cloud",
             "--file",
             str(card_file),
         ]
@@ -155,7 +154,7 @@ def test_cli_value_reports_total_and_missing(
         def formatted_total(self) -> str:
             return "£10.00"
 
-    def fake_value_deck(name_or_slug: str, *, currency: str, resolver=None):
+    def fake_value_deck(name_or_slug: str, *, currency: str, resolver=None, cache=None):
         assert currency.lower() == "gbp"
         return FakeValuation()
 
@@ -167,6 +166,45 @@ def test_cli_value_reports_total_and_missing(
     assert exit_code == 0
     assert "Total value (GBP): £10.00" in output
     assert "Arcane Signet" in output
+
+
+def test_cli_value_all_writes_report_and_prints_totals(
+    deck_dir: Path, tmp_path: Path, capsys: pytest.CaptureFixture[str], monkeypatch: pytest.MonkeyPatch
+):
+    deck_dir.mkdir(parents=True, exist_ok=True)
+    report_path = tmp_path / "valuation-report.md"
+
+    valuations = {
+        "Alpha": DeckValuation(currency="gbp", total=10.0, missing_prices=[]),
+        "Bravo": DeckValuation(currency="gbp", total=0.0, missing_prices=["Unknown Card"]),
+    }
+
+    def fake_value_all(self, *, currency: str, resolver=None, cache=None, now=None):
+        assert currency.lower() == "gbp"
+        return valuations
+
+    monkeypatch.setattr(DeckLibrary, "value_all", fake_value_all)
+
+    exit_code = cli.main(
+        [
+            "--dir",
+            str(deck_dir),
+            "value-all",
+            "--currency",
+            "GBP",
+            "--report",
+            str(report_path),
+        ]
+    )
+
+    output = capsys.readouterr().out
+
+    assert exit_code == 0
+    assert "Alpha: £10.00" in output
+    assert "Wrote valuation report" in output
+    report_text = report_path.read_text(encoding="utf-8")
+    assert "As of:" in report_text
+    assert "Unknown Card" in report_text
 
 
 def test_cli_validate_reports_success_and_writes_log(

@@ -19,17 +19,17 @@ By default the CLI looks for decks in `./decks`. Point to another directory with
 ## Quick start (CLI)
 ```bash
 mtg-decks list
-mtg-decks show "The Ur-Dragon, Eternal Sky Tyrant"
-mtg-decks create "Atraxa Superfriends" "Atraxa, Praetors' Voice" --colors W U B G --theme "Superfriends control"
-mtg-decks import "Messy Deck" "Atraxa, Praetors' Voice" --cards $'2 sol rng\n1 arcane signet'
-mtg-decks value "The Ur-Dragon, Eternal Sky Tyrant" --currency gbp
+mtg-decks show "Tidus, Yuna's Guardian"
+mtg-decks create "Bear Brigade" "Kudo, King Among Bears" --colors W G --theme "Bear tribal tokens"
+mtg-decks import "Messy Deck" "Kudo, King Among Bears" --cards $'2 sol rng\n1 arcane signet'
+mtg-decks value "Tidus, Yuna's Guardian" --currency gbp
 ```
 Typical `list` and `show` output:
 ```
-The Ur-Dragon, Eternal Sky Tyrant (W, U, B, R, G) :: Commander: The Ur-Dragon
+Tidus, Yuna's Guardian (W, U, B, R, G) :: Commander: Tidus, Yuna's Guardian
 
-The Ur-Dragon, Eternal Sky Tyrant
-Commander: The Ur-Dragon
+Tidus, Yuna's Guardian
+Commander: Tidus, Yuna's Guardian
 Colors: W, U, B, R, G
 Format: Commander
 Created: 2024-06-21
@@ -51,33 +51,33 @@ Add `--dir PATH` to any command to work against a different deck folder. Check t
 Decks use YAML-style front matter followed by Markdown content. A minimal example:
 ```markdown
 ---
-name: Atraxa Superfriends
-commander: Atraxa, Praetors' Voice
-colors: W, U, B, G
-theme: Superfriends control
+name: Kudo Bears
+commander: Kudo, King Among Bears
+colors: W, G
+theme: Bear tribal tokens and buffs
 format: Commander
-created: 2024-06-21
-notes: Lean into planeswalkers and proliferate engines.
+created: 2024-07-20
+notes: Flood the board with efficient bears and anthem effects.
 ---
 
-# Atraxa Superfriends
+# Kudo Bears
 
-**Commander:** Atraxa, Praetors' Voice
-**Theme:** Superfriends control
-**Colors:** W, U, B, G
+**Commander:** Kudo, King Among Bears
+**Theme:** Bear tribal tokens and buffs
+**Colors:** W, G
 **Format:** Commander
 
 ## Decklist
-- [Commander] Atraxa, Praetors' Voice
-- Teferi, Temporal Archmage
-- Oko, Thief of Crowns
-- Smothering Tithe
-- Doubling Season
+- [Commander] Kudo, King Among Bears
+- Ayula, Queen Among Bears
+- Bearscape
+- Guardian Project
+- Kodama's Reach
 ```
 
 ### Filenames and slugs
-- Filenames are derived from deck names (e.g., `"Atraxa Superfriends"` → `atraxa-superfriends.md`).
-- Use names or slugs interchangeably with the CLI (`mtg-decks show atraxa-superfriends`).
+- Filenames are derived from deck names (e.g., `"Kudo Bears"` → `kudo-bears.md`).
+- Use names or slugs interchangeably with the CLI (`mtg-decks show kudo-bears`).
 
 ## Validation and rules
 Use `CommanderRules` to enforce construction rules such as 100 cards, singleton enforcement, mandatory commander tags, and banned cards.
@@ -101,12 +101,30 @@ Notes:
 ## Importing rough decklists
 Quickly bootstrap decks from messy sources by letting the importer normalize entries:
 ```bash
-mtg-decks import "Uploaded Deck" "The Ur-Dragon" --file cards.csv --overwrite
+mtg-decks import "Uploaded Deck" "Tidus, Yuna's Guardian" --file cards.csv --overwrite
 # or
-mtg-decks import "Uploaded Deck" "The Ur-Dragon" --cards $'2 sol rng\n1 arcane signet' --theme "Big dragons"
+mtg-decks import "Uploaded Deck" "Tidus, Yuna's Guardian" --cards $'2 sol rng\n1 arcane signet' --theme "Big dragons"
 ```
+How the importer works under the hood:
+- Parses newline or CSV rows into `(count, name)` pairs and tolerates suffixes such as `2x`/`3X` when they lead the entry.
+- Uses Scryfall's fuzzy matcher to normalize commander and card names; falls back to your text when a lookup fails.
+- Uses the commander's color identity unless `--colors` is provided.
+- Removes explicit commander entries from the decklist so you do not end up with duplicates in the Markdown output.
+- Writes a Markdown file in your decks directory using the deck slug (`<deck-name>.md`).
+- Optionally enforces `CommanderRules` if you pass `--rules` in Python, deleting the generated file again when validation fails.
+
+Usage tips for adding decks:
+- CSVs must be `count,name` and text can be free-form lines like `2 Sol Ring` or `1x Arcane Signet`.
+- Pass `--overwrite` if you are re-importing a deck to update an existing file.
+- To import from another site such as Moxfield, export the decklist as text or CSV and feed it directly:
+  ```bash
+  mtg-decks import "<Deck Name>" "<Commander>" --file exported.csv --theme "Copied from Moxfield" --overwrite
+  # or, when you copied the decklist into your clipboard, paste it into --cards
+  mtg-decks import "<Deck Name>" "<Commander>" --cards "$'<pasted deck text>'"
+  ```
 Behavior and tips:
 - Accepts CSV rows (`quantity,name`) or newline-separated text (`2 Sol Ring`).
+- Handles common count suffixes like `2x Sol Ring` or `2X Sol Ring` in addition to bare numbers.
 - Uses Scryfall's fuzzy matcher to clean up names; falls back to your input when lookups fail.
 - Infers colors from the commander unless `--colors` is supplied.
 - You can enforce `CommanderRules` during import from Python:
@@ -117,7 +135,7 @@ Behavior and tips:
   library = DeckLibrary("decks")
   result = library.import_deck(
       "Uploaded Deck",
-      "The Ur-Dragon",
+      "Tidus, Yuna's Guardian",
       card_source=Path("cards.csv"),
       rules=CommanderRules(),
       overwrite=True,
@@ -129,18 +147,42 @@ Behavior and tips:
 ## Valuing decks
 Estimate deck value from Scryfall price fields:
 ```bash
-mtg-decks value "The Ur-Dragon, Eternal Sky Tyrant" --currency gbp
+mtg-decks value "Tidus, Yuna's Guardian" --currency gbp
 ```
 From Python, reuse the same logic and control the currency or resolver:
 ```python
 from mtg_decks import DeckLibrary
 
 library = DeckLibrary("decks")
-valuation = library.value_deck("The Ur-Dragon, Eternal Sky Tyrant", currency="usd")
+valuation = library.value_deck("Tidus, Yuna's Guardian", currency="usd")
 print(valuation.total, valuation.formatted_total())
 print("Missing prices:", valuation.missing_prices)
 ```
 `--currency`/`currency` should match a Scryfall price key (`gbp`, `usd`, `eur`, etc.). Missing prices are reported separately so you know which cards need manual prices.
+
+Valuations are cached in `valuation-cache.json` (configurable) so repeat runs only fetch prices when a deck has never been
+valued or its last valuation is from a previous calendar month. Cache hits keep network traffic low when you are checking
+prices frequently.
+
+To track how totals change over time, run a batch valuation and write a timestamped Markdown report:
+```bash
+PYTHONPATH=src mtg-decks value-all --currency usd --report valuation-report.md
+```
+Commit or archive each `valuation-report.md` snapshot so you can diff how deck prices move between runs.
+Use `--source` (or `MTG_DECKS_VALUATION_SOURCE`) to pick the price provider; `scryfall` is supported today.
+
+### Configuring valuation defaults
+- `MTG_DECKS_CURRENCY`: default pricing currency (e.g., `USD`, `EUR`, `GBP`).
+- `MTG_DECKS_VALUATION_SOURCE`: preferred price source (defaults to `scryfall`).
+- `MTG_DECKS_VALUATION_CACHE`: path to the valuation cache file (defaults to `valuation-cache.json`).
+
+You can set these as environment variables or create a simple `.env` file next to the CLI entrypoint:
+
+```
+# .env
+MTG_DECKS_CURRENCY=usd
+MTG_DECKS_VALUATION_CACHE=.data/valuation-cache.json
+```
 
 ## Templates and customization
 `create` and `import` accept `--template path/to/template.md` to render the body with placeholders like `{name}`, `{commander}`, `{colors}`, `{format}`, `{created}`, and `{notes}`. Store templates alongside your decks or in a dedicated folder for reuse.

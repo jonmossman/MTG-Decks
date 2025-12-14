@@ -75,15 +75,35 @@ def parse_import_rows(text: str) -> list[tuple[int, str]]:
         else:
             line = row[0].strip()
             parts = line.split(maxsplit=1)
-            if len(parts) == 2 and parts[0].isdigit():
+            if len(parts) == 2 and _looks_like_count(parts[0]):
                 count_text, name = parts[0], parts[1]
             else:
                 count_text, name = "1", line
 
-        count = int(count_text) if count_text.isdigit() else 1
+        count = _parse_count(count_text)
         rows.append((count, name))
 
     return rows
+
+
+def _parse_count(text: str) -> int:
+    """Convert text to an integer card count, handling common suffixes."""
+
+    stripped = text.rstrip().lower()
+    if stripped.endswith("x"):
+        stripped = stripped[:-1]
+
+    if stripped.isdigit():
+        return int(stripped)
+
+    return 1
+
+
+def _looks_like_count(text: str) -> bool:
+    stripped = text.strip().lower()
+    if stripped.endswith("x"):
+        stripped = stripped[:-1]
+    return stripped.isdigit()
 
 
 def import_deck(

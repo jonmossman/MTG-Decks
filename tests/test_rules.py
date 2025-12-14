@@ -14,18 +14,18 @@ def test_parse_decklist_extracts_counts_and_commander():
         # Sample Deck
 
         ## Decklist
-        - [Commander] Atraxa, Praetors' Voice
+        - [Commander] Cloud, Ex-SOLDIER
         - 3x Island
         - Sol Ring
         - 2 Farseek
         - Forest
-        """
+    """
     )
 
     card_counts, commanders = parse_decklist(markdown)
 
-    assert commanders == {"Atraxa, Praetors' Voice"}
-    assert card_counts["Atraxa, Praetors' Voice"] == 1
+    assert commanders == {"Cloud, Ex-SOLDIER"}
+    assert card_counts["Cloud, Ex-SOLDIER"] == 1
     assert card_counts["Island"] == 3
     assert card_counts["Farseek"] == 2
     assert card_counts["Sol Ring"] == 1
@@ -33,17 +33,17 @@ def test_parse_decklist_extracts_counts_and_commander():
 
 def test_commander_rules_flag_size_and_duplicate_issues():
     deck = Deck(
-        name="Atraxa Superfriends",
-        commander="Atraxa, Praetors' Voice",
+        name="Limit Break",
+        commander="Cloud, Ex-SOLDIER",
         colors=["W", "U", "B", "G"],
     )
     card_counts = {
-        "Atraxa, Praetors' Voice": 2,
+        "Cloud, Ex-SOLDIER": 2,
         "Sol Ring": 2,
         "Island": 30,
     }
     card_counts.update({f"Card {idx}": 1 for idx in range(1, 68)})
-    commanders = {"Atraxa, Praetors' Voice"}
+    commanders = {"Cloud, Ex-SOLDIER"}
 
     rules = CommanderRules()
     errors = rules.validate(deck, card_counts, commanders)
@@ -86,8 +86,8 @@ def _filler_counts(starting: dict[str, int], total: int = 100) -> dict[str, int]
 
 
 def test_commander_tag_is_required_by_default():
-    deck = Deck(name="Tagless", commander="Atraxa, Praetors' Voice")
-    card_counts = _filler_counts({"Atraxa, Praetors' Voice": 1})
+    deck = Deck(name="Tagless", commander="Cloud, Ex-SOLDIER")
+    card_counts = _filler_counts({"Cloud, Ex-SOLDIER": 1})
 
     rules = CommanderRules()
     errors = rules.validate(deck, card_counts, commander_entries=set())
@@ -96,11 +96,11 @@ def test_commander_tag_is_required_by_default():
 
 
 def test_banned_cards_are_rejected():
-    deck = Deck(name="Powered", commander="Atraxa, Praetors' Voice")
-    card_counts = _filler_counts({"Atraxa, Praetors' Voice": 1, "Black Lotus": 1})
+    deck = Deck(name="Powered", commander="Cloud, Ex-SOLDIER")
+    card_counts = _filler_counts({"Cloud, Ex-SOLDIER": 1, "Black Lotus": 1})
 
     rules = CommanderRules(banned_cards={"Black Lotus"})
-    errors = rules.validate(deck, card_counts, commander_entries={"Atraxa, Praetors' Voice"})
+    errors = rules.validate(deck, card_counts, commander_entries={"Cloud, Ex-SOLDIER"})
 
     assert any("Black Lotus" in err for err in errors)
 
