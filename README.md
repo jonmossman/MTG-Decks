@@ -183,7 +183,7 @@ Import cards from a CSV or pasted text while tagging the storage box:
 mtg-decks spares import --box "Staples" --cards $'2 Sol Ring\n1 Arcane Signet'
 mtg-decks spares import --box "Cube Box" --file spares.csv --sort value
 ```
-Each run merges counts with existing entries, prices the cards, and rewrites `spares.md` (or your chosen path) with a table that includes count, box, type line, converted mana cost, and both unit and total value.
+Each run merges counts with existing entries, prices the cards, and rewrites `spares.md` with a table that includes count, box, type line, converted mana cost, and both unit and total value.
 CSV rows can be `Count,Name` or `Name,Count`, and optional header rows (e.g., `Count,Name`) are ignored.
 
 Search the inventory with filters and sorting:
