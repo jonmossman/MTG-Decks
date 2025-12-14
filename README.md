@@ -51,6 +51,16 @@ Created: 2024-06-21
 
 Add `--dir PATH` to any command to work against a different deck folder. Check the tool version with `mtg-decks --version`.
 
+## Running the tests
+The project ships with a fast pytest suite that exercises the CLI, importer, validation rules, and valuation logic. To run it locally:
+
+```bash
+python -m pip install -e .[dev]
+pytest
+```
+
+Tests use temporary deck directories and fake resolvers so they do not touch real files or Scryfall. The suite finishes in well under a second on a typical laptop, so it is safe to run before every change.
+
 ## Deck file layout
 Decks use YAML-style front matter followed by Markdown content. A minimal example:
 ```markdown
