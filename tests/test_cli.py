@@ -90,8 +90,8 @@ def test_cli_import_creates_deck_and_reports_warnings(
             self.mapping = {
                 "sol rng": importer_module.CardData(name="Sol Ring"),
                 "Arcane Signet": importer_module.CardData(name="Arcane Signet"),
-                "Atraxa": importer_module.CardData(
-                    name="Atraxa, Praetors' Voice", color_identity=["W", "U", "B", "G"]
+                "Cloud": importer_module.CardData(
+                    name="Cloud, Ex-SOLDIER", color_identity=["W", "U", "B", "G"]
                 ),
             }
 
@@ -109,7 +109,7 @@ def test_cli_import_creates_deck_and_reports_warnings(
             str(deck_dir),
             "import",
             "Imported Deck",
-            "Atraxa",
+            "Cloud",
             "--file",
             str(card_file),
         ]

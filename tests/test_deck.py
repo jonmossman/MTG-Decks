@@ -12,7 +12,7 @@ from mtg_decks.rules import CommanderRules
 @pytest.mark.parametrize(
     "text, expected",
     [
-        ("Atraxa Superfriends", "atraxa-superfriends"),
+        ("Limit Break", "limit-break"),
         ("  Chaos ! Control  ", "chaos-control"),
         ("only$$$symbols###", "onlysymbols"),
         ("", "deck"),
@@ -24,15 +24,15 @@ def test_slugify_variations(text, expected):
 
 def test_round_trip_markdown(tmp_path: Path):
     deck = Deck(
-        name="Atraxa Superfriends",
-        commander="Atraxa, Praetors' Voice",
+        name="Limit Break",
+        commander="Cloud, Ex-SOLDIER",
         colors=["W", "U", "B", "G"],
         theme="Superfriends control",
         notes="Protect your walkers",
         created="2024-01-01",
         updated="2024-01-02",
     )
-    path = tmp_path / "atraxa-superfriends.md"
+    path = tmp_path / "limit-break.md"
     path.write_text(deck.to_markdown(), encoding="utf-8")
 
     loaded = Deck.from_file(path)

@@ -19,17 +19,17 @@ By default the CLI looks for decks in `./decks`. Point to another directory with
 ## Quick start (CLI)
 ```bash
 mtg-decks list
-mtg-decks show "The Ur-Dragon, Eternal Sky Tyrant"
-mtg-decks create "Atraxa Superfriends" "Atraxa, Praetors' Voice" --colors W U B G --theme "Superfriends control"
-mtg-decks import "Messy Deck" "Atraxa, Praetors' Voice" --cards $'2 sol rng\n1 arcane signet'
-mtg-decks value "The Ur-Dragon, Eternal Sky Tyrant" --currency gbp
+mtg-decks show "Tidus, Yuna's Guardian"
+mtg-decks create "Limit Break" "Cloud, Ex-SOLDIER" --colors W U B G --theme "Superfriends control"
+mtg-decks import "Messy Deck" "Cloud, Ex-SOLDIER" --cards $'2 sol rng\n1 arcane signet'
+mtg-decks value "Tidus, Yuna's Guardian" --currency gbp
 ```
 Typical `list` and `show` output:
 ```
-The Ur-Dragon, Eternal Sky Tyrant (W, U, B, R, G) :: Commander: The Ur-Dragon
+Tidus, Yuna's Guardian (W, U, B, R, G) :: Commander: Tidus, Yuna's Guardian
 
-The Ur-Dragon, Eternal Sky Tyrant
-Commander: The Ur-Dragon
+Tidus, Yuna's Guardian
+Commander: Tidus, Yuna's Guardian
 Colors: W, U, B, R, G
 Format: Commander
 Created: 2024-06-21
@@ -51,8 +51,8 @@ Add `--dir PATH` to any command to work against a different deck folder. Check t
 Decks use YAML-style front matter followed by Markdown content. A minimal example:
 ```markdown
 ---
-name: Atraxa Superfriends
-commander: Atraxa, Praetors' Voice
+name: Limit Break
+commander: Cloud, Ex-SOLDIER
 colors: W, U, B, G
 theme: Superfriends control
 format: Commander
@@ -60,15 +60,15 @@ created: 2024-06-21
 notes: Lean into planeswalkers and proliferate engines.
 ---
 
-# Atraxa Superfriends
+# Limit Break
 
-**Commander:** Atraxa, Praetors' Voice
+**Commander:** Cloud, Ex-SOLDIER
 **Theme:** Superfriends control
 **Colors:** W, U, B, G
 **Format:** Commander
 
 ## Decklist
-- [Commander] Atraxa, Praetors' Voice
+- [Commander] Cloud, Ex-SOLDIER
 - Teferi, Temporal Archmage
 - Oko, Thief of Crowns
 - Smothering Tithe
@@ -76,8 +76,8 @@ notes: Lean into planeswalkers and proliferate engines.
 ```
 
 ### Filenames and slugs
-- Filenames are derived from deck names (e.g., `"Atraxa Superfriends"` → `atraxa-superfriends.md`).
-- Use names or slugs interchangeably with the CLI (`mtg-decks show atraxa-superfriends`).
+- Filenames are derived from deck names (e.g., `"Limit Break"` → `limit-break.md`).
+- Use names or slugs interchangeably with the CLI (`mtg-decks show limit-break`).
 
 ## Validation and rules
 Use `CommanderRules` to enforce construction rules such as 100 cards, singleton enforcement, mandatory commander tags, and banned cards.
@@ -101,9 +101,9 @@ Notes:
 ## Importing rough decklists
 Quickly bootstrap decks from messy sources by letting the importer normalize entries:
 ```bash
-mtg-decks import "Uploaded Deck" "The Ur-Dragon" --file cards.csv --overwrite
+mtg-decks import "Uploaded Deck" "Tidus, Yuna's Guardian" --file cards.csv --overwrite
 # or
-mtg-decks import "Uploaded Deck" "The Ur-Dragon" --cards $'2 sol rng\n1 arcane signet' --theme "Big dragons"
+mtg-decks import "Uploaded Deck" "Tidus, Yuna's Guardian" --cards $'2 sol rng\n1 arcane signet' --theme "Big dragons"
 ```
 How the importer works under the hood:
 - Parses newline or CSV rows into `(count, name)` pairs and tolerates suffixes such as `2x`/`3X` when they lead the entry.
@@ -135,7 +135,7 @@ Behavior and tips:
   library = DeckLibrary("decks")
   result = library.import_deck(
       "Uploaded Deck",
-      "The Ur-Dragon",
+      "Tidus, Yuna's Guardian",
       card_source=Path("cards.csv"),
       rules=CommanderRules(),
       overwrite=True,
@@ -147,14 +147,14 @@ Behavior and tips:
 ## Valuing decks
 Estimate deck value from Scryfall price fields:
 ```bash
-mtg-decks value "The Ur-Dragon, Eternal Sky Tyrant" --currency gbp
+mtg-decks value "Tidus, Yuna's Guardian" --currency gbp
 ```
 From Python, reuse the same logic and control the currency or resolver:
 ```python
 from mtg_decks import DeckLibrary
 
 library = DeckLibrary("decks")
-valuation = library.value_deck("The Ur-Dragon, Eternal Sky Tyrant", currency="usd")
+valuation = library.value_deck("Tidus, Yuna's Guardian", currency="usd")
 print(valuation.total, valuation.formatted_total())
 print("Missing prices:", valuation.missing_prices)
 ```
