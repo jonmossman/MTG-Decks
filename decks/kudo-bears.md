@@ -26,7 +26,6 @@ notes: Flood the board with efficient bears and anthem effects to overwhelm the 
 - Bearscape
 - Words of Wilding
 - Goreclaw, Terror of Qal Sisma
-- Changeling Outcast
 - Metallic Mimic
 - Collected Company
 - Heroic Intervention
@@ -47,6 +46,78 @@ notes: Flood the board with efficient bears and anthem effects to overwhelm the 
 - Command Tower
 - Temple Garden
 - Windswept Heath
-- Forest
+- Boreal Druid
+- Bloom Tender
+- Nature's Lore
+- Three Visits
+- Farseek
+- Guardian Gladewalker
+- Bramblewood Paragon
+- Hardened Scales
+- Cathars' Crusade
+- Beast Whisperer
+- Toski, Bearer of Secrets
+- Fell the Mighty
+- Austere Command
+- Vanquisher's Banner
+- Eldrazi Monument
+- Herald's Horn
+- Gavony Township
+- Canopy Vista
+- Sunpetal Grove
+- Wooded Bastion
+- Bountiful Promenade
+- Razorverge Thicket
+- Brushland
+- Fortified Village
+- Overgrown Farmland
+- Selesnya Sanctuary
+- Myriad Landscape
+- Evolving Wilds
+- Terramorphic Expanse
+- Krosan Verge
+- Field of the Dead
+- Yavimaya, Cradle of Growth
+- Nykthos, Shrine to Nyx
+- Serra Paragon
+- Adeline, Resplendent Cathar
+- Collective Effort
+- Beastmaster Ascension
+- Return of the Wildspeaker
+- Shamanic Revelation
+- Sigarda's Summons
+- Divine Visitation
+- Idyllic Tutor
+- Enlightened Tutor
+- Worldly Tutor
+- Chord of Calling
+- White Sun's Twilight
+- Inspiring Call
+- Flawless Maneuver
+- Unbreakable Formation
+- Ajani, Strength of the Pride
+- Elspeth Resplendent
+- Nissa, Voice of Zendikar
+- Garruk's Uprising
 - Plains
-- ...fill in the rest of your favorite bears and lands.
+- Plains
+- Plains
+- Plains
+- Plains
+- Plains
+- Plains
+- Plains
+- Plains
+- Plains
+- Forest
+- Forest
+- Forest
+- Forest
+- Forest
+- Forest
+- Forest
+- Forest
+- Forest
+- Forest
+- Forest
+- Forest
