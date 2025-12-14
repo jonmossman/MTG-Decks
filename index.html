@@ -7,6 +7,14 @@
   <style>
     :root {
       color-scheme: dark;
+      --bg: #060608;
+      --panel: #0f1116;
+      --border: #1c1f27;
+      --accent: #71c9f8;
+      --accent-strong: #9ae7ff;
+      --text: #f1f5ff;
+      --muted: #a4b3cc;
+      --shadow: 0 16px 40px rgba(0, 0, 0, 0.4);
     }
 
     * {
@@ -15,89 +23,264 @@
 
     body {
       margin: 0;
-      padding: 24px;
-      background: #000;
-      color: #fff;
-      font-family: "Fira Code", "SFMono-Regular", Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      min-height: 100vh;
+      background: radial-gradient(circle at 20% 20%, rgba(113, 201, 248, 0.08), transparent 25%),
+        radial-gradient(circle at 80% 0%, rgba(154, 231, 255, 0.08), transparent 20%),
+        var(--bg);
+      color: var(--text);
+      font-family: "Inter", "SF Pro Text", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
       line-height: 1.6;
+      padding: 32px 16px 48px;
     }
 
     a {
-      color: #9cf;
+      color: var(--accent);
     }
 
     a:hover,
     a:focus-visible {
-      color: #cde3ff;
+      color: var(--accent-strong);
     }
 
-    h1,
-    h2,
-    h3 {
-      margin: 0 0 0.5em;
+    .page {
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+
+    header {
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+      background: linear-gradient(135deg, rgba(113, 201, 248, 0.12), rgba(6, 8, 12, 0.7)), var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 24px;
+      box-shadow: var(--shadow);
+    }
+
+    .topbar {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 12px;
+      justify-content: space-between;
+    }
+
+    .brand {
+      font-size: 1.2rem;
       font-weight: 700;
-    }
-
-    p {
-      margin: 0 0 0.75em;
-    }
-
-    .section {
-      border: 1px solid #222;
-      padding: 16px;
-      margin-bottom: 16px;
-      background: #0a0a0a;
+      letter-spacing: 0.4px;
     }
 
     .nav {
       display: flex;
-      gap: 12px;
       flex-wrap: wrap;
+      gap: 10px;
     }
 
-    .nav a {
+    .button {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 14px;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      background: rgba(255, 255, 255, 0.02);
+      color: var(--text);
       text-decoration: none;
-      border: 1px solid #333;
-      padding: 8px 12px;
-      background: #111;
-      color: #fff;
+      font-weight: 600;
+      transition: transform 120ms ease, border-color 120ms ease, background 120ms ease;
     }
 
-    .nav a:hover,
-    .nav a:focus-visible {
-      border-color: #555;
-      background: #181818;
+    .button:hover,
+    .button:focus-visible {
+      transform: translateY(-1px);
+      border-color: #2a2f3b;
+      background: rgba(113, 201, 248, 0.08);
+    }
+
+    .button.primary {
+      background: linear-gradient(120deg, #58b8f1, #7de4ff);
+      color: #041019;
+      border-color: transparent;
+      box-shadow: 0 12px 30px rgba(113, 201, 248, 0.25);
+    }
+
+    .button.primary:hover,
+    .button.primary:focus-visible {
+      transform: translateY(-2px);
+      box-shadow: 0 16px 38px rgba(113, 201, 248, 0.35);
+      background: linear-gradient(120deg, #64c2f9, #8cf0ff);
+    }
+
+    .hero-title {
+      font-size: clamp(1.8rem, 2.8vw + 1rem, 2.6rem);
+      margin: 0;
+      letter-spacing: 0.4px;
+    }
+
+    .hero-subtitle {
+      color: var(--muted);
+      margin: 0;
+      max-width: 720px;
+      font-size: 1.05rem;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 16px;
+      margin-top: 20px;
+    }
+
+    .card {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 16px;
+      box-shadow: var(--shadow);
+      display: grid;
+      gap: 8px;
+    }
+
+    .card h2 {
+      margin: 0;
+      font-size: 1.1rem;
+      letter-spacing: 0.2px;
+    }
+
+    .card p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 0.98rem;
+    }
+
+    .pill-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .pill {
+      border-radius: 999px;
+      padding: 6px 10px;
+      border: 1px solid var(--border);
+      background: #0b0d12;
+      color: var(--muted);
+      font-size: 0.9rem;
+    }
+
+    .section-title {
+      margin: 28px 0 10px;
+      font-size: 1.15rem;
+      letter-spacing: 0.2px;
+    }
+
+    ul.feature-list {
+      list-style: none;
+      padding: 0;
+      margin: 10px 0 0;
+      display: grid;
+      gap: 10px;
+    }
+
+    ul.feature-list li {
+      background: #0b0d12;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 10px 12px;
+      color: var(--muted);
+    }
+
+    .footer {
+      margin-top: 26px;
+      color: var(--muted);
+      text-align: center;
+      font-size: 0.95rem;
     }
   </style>
 </head>
 <body>
-  <header class="section">
-    <h1>MTG Decks &amp; Inventory</h1>
-    <p>A plain-text friendly homepage for browsing decks, spare-card inventory, and project config on GitHub Pages.</p>
-    <nav class="nav">
-      <a href="decks.html">Deck Browser</a>
-      <a href="inventory.html">Inventory</a>
-      <a href="README.md">README</a>
-      <a href="FUNCTIONAL_SPEC.md">Functional Spec</a>
-      <a href="valuation-report.md">Valuation Report</a>
-    </nav>
-  </header>
+  <div class="page">
+    <header>
+      <div class="topbar">
+        <div class="brand">MTG Decks &amp; Inventory</div>
+        <nav class="nav">
+          <a class="button" href="decks.html">Browse Decks</a>
+          <a class="button" href="inventory.html">Open Inventory</a>
+          <a class="button" href="#docs">Docs</a>
+        </nav>
+      </div>
 
-  <main>
-    <section class="section">
-      <h2>Decks</h2>
-      <p>Open the Deck Browser to read decklists in their original markdown. Each deck is loaded from the repository so you can keep editing the files you already maintain.</p>
-    </section>
+      <div>
+        <h1 class="hero-title">Give your Magic projects a friendly launchpad.</h1>
+        <p class="hero-subtitle">
+          Jump straight into your decklists, track spare cards, and access docs without digging through folders.
+          Everything stays dark-mode, keyboard-friendly, and ready for GitHub Pages.
+        </p>
+      </div>
 
-    <section class="section">
-      <h2>Inventory</h2>
-      <p>The Inventory page parses the <code>inventory.md</code> table and lets you search, sort, and filter cards while keeping the black background and white text aesthetic.</p>
-    </section>
+      <div class="nav">
+        <a class="button primary" href="decks.html">Deck Browser</a>
+        <a class="button" href="inventory.html">Inventory Table</a>
+        <a class="button" href="valuation-report.md">Valuation Report</a>
+        <a class="button" href="FUNCTIONAL_SPEC.md">Functional Spec</a>
+      </div>
 
-    <section class="section">
-      <h2>Configuration &amp; Notes</h2>
-      <p>Quick links to documentation and reports live alongside the decks and inventory so everything is reachable from one index page.</p>
-    </section>
-  </main>
+      <div class="pill-row">
+        <span class="pill">Live markdown rendering</span>
+        <span class="pill">Keyboard + mouse friendly</span>
+        <span class="pill">Dark theme by default</span>
+        <span class="pill">Zero build steps</span>
+      </div>
+    </header>
+
+    <section class="section-title">Quick starts</section>
+    <div class="grid">
+      <article class="card">
+        <h2>Deck Browser</h2>
+        <p>Load any markdown decklist stored in <code>decks/</code> and skim it in a clean, monospace view.</p>
+        <div class="pill-row">
+          <span class="pill">Commander callouts</span>
+          <span class="pill">Instant loading</span>
+        </div>
+        <a class="button" href="decks.html">Open Deck Browser</a>
+      </article>
+
+      <article class="card">
+        <h2>Spare Inventory</h2>
+        <p>Search and filter <code>inventory.md</code> with box + type filters to find trade fodder in seconds.</p>
+        <div class="pill-row">
+          <span class="pill">Sort any column</span>
+          <span class="pill">Lightweight parsing</span>
+        </div>
+        <a class="button" href="inventory.html">Open Inventory</a>
+      </article>
+
+      <article class="card" id="docs">
+        <h2>Docs &amp; Reports</h2>
+        <p>Keep specs, valuations, and notes close by so collaborators can jump in with context.</p>
+        <div class="pill-row">
+          <span class="pill">Project docs</span>
+          <span class="pill">Valuation snapshot</span>
+        </div>
+        <div class="nav">
+          <a class="button" href="README.md">README</a>
+          <a class="button" href="FUNCTIONAL_SPEC.md">Functional Spec</a>
+          <a class="button" href="valuation-report.md">Valuation Report</a>
+        </div>
+      </article>
+    </div>
+
+    <section class="section-title">What you can do</section>
+    <ul class="feature-list">
+      <li><strong>Skim quickly.</strong> Use Deck Browser to hop between builds, view commanders, and copy card names without leaving the page.</li>
+      <li><strong>Stay organized.</strong> Inventory search lets you combine text search with box and type filters so you can find trade stock fast.</li>
+      <li><strong>Share context.</strong> Link friends straight to specs, valuation reports, or notes with the buttons above.</li>
+      <li><strong>Edit safely.</strong> Everything reads directly from the repo, so updating markdown files instantly updates the site.</li>
+    </ul>
+
+    <div class="footer">Built for GitHub Pages — optimized for dark mode, quick navigation, and markdown-first workflows.</div>
+  </div>
 </body>
 </html>
