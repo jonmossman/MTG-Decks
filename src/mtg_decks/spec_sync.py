@@ -12,8 +12,9 @@ import re
 
 
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
+SITE_ROOT = PROJECT_ROOT / "site"
 DEFAULT_MD_PATH = PROJECT_ROOT / "FUNCTIONAL_SPEC.md"
-DEFAULT_HTML_PATH = PROJECT_ROOT / "functional-spec.html"
+DEFAULT_HTML_PATH = SITE_ROOT / "functional-spec.html"
 DEFAULT_ERROR_LOG = PROJECT_ROOT / "error.log"
 
 
@@ -465,6 +466,7 @@ def regenerate_html(md_path: Path = DEFAULT_MD_PATH, html_path: Path = DEFAULT_H
 
     markdown_path = resolve_markdown_source(md_path)
     html_target = resolve_html_target(html_path)
+    html_target.parent.mkdir(parents=True, exist_ok=True)
     html_target.write_text(render_spec_html(markdown_path.read_text(encoding="utf-8")), encoding="utf-8")
 
 

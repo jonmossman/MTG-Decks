@@ -4,3 +4,4 @@ __pycache__/
 .env
 valuation-cache.json
 error.log
+.coverage

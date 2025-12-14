@@ -29,12 +29,13 @@ mtg-decks value "Tidus, Yuna's Guardian" --currency gbp
 
 ## GitHub Pages viewer (plain text, dark theme)
 The repository includes a minimal Pages-friendly frontend so you can browse decks and inventory without leaving plain text. The
-HTML lives at the repository root:
+HTML lives under `site/` to keep the repository root focused on the library and data files. There are no duplicate HTML copies
+at the repository root, so `site/` is the single source of truth for anything published to GitHub Pages:
 
-- `index.html`: links to decks, inventory, README, the functional spec, upload guide, and valuation report.
-- `decks.html`: lists deck files and fetches their raw markdown.
-- `inventory.html`: loads `inventory.md` and adds search/sort/filter controls over the table.
-- `upload.html`: a step-by-step guide for adding, amending, or removing decks and inventory entries.
+- `site/index.html`: links to decks, inventory, README, the functional spec, upload guide, and valuation report.
+- `site/decks.html`: lists deck files and fetches their raw markdown.
+- `site/inventory.html`: loads `inventory.md` and adds search/sort/filter controls over the table.
+- `site/upload.html`: a step-by-step guide for adding, amending, or removing decks and inventory entries.
 
 To publish on GitHub Pages:
 
@@ -60,8 +61,8 @@ Use this checklist when you add a new deck or update the spare-card inventory so
 
 After intentional HTML changes, refresh the snapshot hashes so pytest accepts the new baseline (see “Updating the HTML snapshot hashes” below).
 
-Everything uses a black background, white text, and monospace fonts to stay readable as plain text. You can preview locally with
-`python -m http.server` from the repo root and opening `http://localhost:8000/index.html` in a browser.
+Everything uses a black background, white text, and monospace fonts to stay readable as plain text. You can preview locally wit
+h `python -m http.server --directory site` from the repo root and opening `http://localhost:8000/index.html` in a browser.
 Typical `list` and `show` output:
 ```
 Tidus, Yuna's Guardian (W, U, B, R, G) :: Commander: Tidus, Yuna's Guardian
@@ -92,12 +93,13 @@ The project ships with a fast pytest suite that exercises the CLI, importer, val
 
 ```bash
 python -m pip install -e .[dev]
-pytest
+PYTHONPATH=src pytest -q          # default serial run
+# PYTHONPATH=src pytest -q -n 2   # faster when pytest-xdist is installed
 ```
 
-Tests use temporary deck directories and fake resolvers so they do not touch real files or Scryfall. The suite finishes in well under a second on a typical laptop, so it is safe to run before every change.
+Tests use temporary deck directories and fake resolvers so they do not touch real files or Scryfall. See `TEST_STRATEGY.md` for fixture layout, performance tips, and notes on running with multiple workers.
 
-Each pytest run overwrites `pytest-results.md` in the repository root with a short Markdown summary (counts, duration, exit status). Commit it alongside code changes so readers can see the latest test outcome. If CI is running tests from an installed package path or a read-only workspace, point the report somewhere writable via `PYTEST_RESULTS_PATH=/tmp/pytest-results.md`; the hook will fall back to writing in the current working directory if the configured location is unavailable.
+Each pytest run overwrites `pytest-results.md` in the repository root with a short Markdown summary (counts, duration, exit status, and line coverage for `src/mtg_decks`). Commit it alongside code changes so readers can see the latest test outcome. If CI is running tests from an installed package path or a read-only workspace, point the report somewhere writable via `PYTEST_RESULTS_PATH=/tmp/pytest-results.md`; the hook will fall back to writing in the current working directory if the configured location is unavailable.
 
 ### Updating the HTML snapshot hashes
 `tests/test_html_baseline.py` locks down the public HTML files (e.g., `index.html`) by comparing their SHA256 hashes to the last known-good version. When you intentionally change an HTML file, refresh the snapshot mapping so pytest reflects the new baseline:

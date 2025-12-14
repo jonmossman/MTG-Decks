@@ -38,8 +38,7 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          python -m pip install .
-          python -m pip install pytest
+          python -m pip install ".[dev]"
 
       - name: Regenerate functional spec outputs
         run: |
@@ -50,6 +49,10 @@ jobs:
           mkdir -p reports
           pytest --junitxml=reports/pytest.xml | tee reports/pytest.log
 
+      - name: Validate Pages assets
+        run: |
+          python -m mtg_decks.site_checks
+
       - name: Upload test reports
         uses: actions/upload-artifact@v4
         with:
@@ -59,7 +62,7 @@ jobs:
       - name: Prepare GitHub Pages content
         run: |
           mkdir -p public
-          cp index.html decks.html inventory.html .nojekyll public/
+          cp site/index.html site/decks.html site/inventory.html site/upload.html site/functional-spec.html site/.nojekyll public/
           cp README.md inventory.md valuation-report.md FUNCTIONAL_SPEC.md public/
           cp -r decks public/
 
