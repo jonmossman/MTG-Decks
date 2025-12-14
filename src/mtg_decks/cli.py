@@ -1,12 +1,26 @@
 from __future__ import annotations
 
 import argparse
+import datetime as _dt
 import sys
 from pathlib import Path
 
 from . import __version__
+from .importer import ScryfallResolver
+from .config import load_config
 from .library import DeckLibrary
 from .rules import CommanderRules
+from .valuation import ValuationCache, render_valuation_report
+
+
+_APP_CONFIG = load_config()
+
+
+def _resolver_from_source(source: str):
+    normalized = (source or "scryfall").lower()
+    if normalized == "scryfall":
+        return ScryfallResolver()
+    raise ValueError(f"Unsupported valuation source: {source}")
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -101,10 +115,59 @@ def build_parser() -> argparse.ArgumentParser:
     value_parser.add_argument("name", help="Deck name or slug")
     value_parser.add_argument(
         "--currency",
-        default="GBP",
-        help="Three-letter currency code to price cards in (default: GBP)",
+        default=_APP_CONFIG.default_currency,
+        help=(
+            "Three-letter currency code to price cards in "
+            f"(default: {_APP_CONFIG.default_currency.upper()})"
+        ),
+    )
+    value_parser.add_argument(
+        "--source",
+        default=_APP_CONFIG.valuation_source,
+        help=(
+            "Price source to use for valuations "
+            f"(default: {_APP_CONFIG.valuation_source})"
+        ),
+    )
+    value_parser.add_argument(
+        "--cache",
+        type=Path,
+        default=_APP_CONFIG.valuation_cache_path,
+        help="Path to a valuation cache file used to reuse recent totals",
     )
     value_parser.set_defaults(func=cmd_value)
+
+    value_all_parser = subparsers.add_parser(
+        "value-all", help="Estimate value for all decks and optionally write a report"
+    )
+    value_all_parser.add_argument(
+        "--currency",
+        default=_APP_CONFIG.default_currency,
+        help=(
+            "Three-letter currency code to price cards in "
+            f"(default: {_APP_CONFIG.default_currency.upper()})"
+        ),
+    )
+    value_all_parser.add_argument(
+        "--source",
+        default=_APP_CONFIG.valuation_source,
+        help=(
+            "Price source to use for valuations "
+            f"(default: {_APP_CONFIG.valuation_source})"
+        ),
+    )
+    value_all_parser.add_argument(
+        "--cache",
+        type=Path,
+        default=_APP_CONFIG.valuation_cache_path,
+        help="Path to a valuation cache file used to reuse recent totals",
+    )
+    value_all_parser.add_argument(
+        "--report",
+        type=Path,
+        help="Optional Markdown file to write valuation results (overwrites)",
+    )
+    value_all_parser.set_defaults(func=cmd_value_all)
 
     validate_parser = subparsers.add_parser(
         "validate", help="Validate deck files against Commander rules"
@@ -235,8 +298,14 @@ def cmd_import(args: argparse.Namespace) -> int:
 
 def cmd_value(args: argparse.Namespace) -> int:
     library = DeckLibrary(args.deck_dir)
+    cache = ValuationCache(args.cache)
     try:
-        valuation = library.value_deck(args.name, currency=args.currency)
+        valuation = library.value_deck(
+            args.name,
+            currency=args.currency,
+            resolver=_resolver_from_source(args.source),
+            cache=cache,
+        )
     except FileNotFoundError as exc:  # pragma: no cover - user facing
         print(str(exc), file=sys.stderr)
         return 1
@@ -249,6 +318,35 @@ def cmd_value(args: argparse.Namespace) -> int:
         print("Missing prices for:")
         for name in sorted(valuation.missing_prices):
             print(f"- {name}")
+    return 0
+
+
+def cmd_value_all(args: argparse.Namespace) -> int:
+    library = DeckLibrary(args.deck_dir)
+    as_of = _dt.datetime.utcnow()
+    cache = ValuationCache(args.cache)
+
+    try:
+        valuations = library.value_all(
+            currency=args.currency,
+            resolver=_resolver_from_source(args.source),
+            cache=cache,
+            now=as_of,
+        )
+    except Exception as exc:  # pragma: no cover - user facing
+        print(str(exc), file=sys.stderr)
+        return 1
+
+    for name, valuation in sorted(valuations.items(), key=lambda item: item[0].lower()):
+        print(f"{name}: {valuation.formatted_total()}")
+
+    if args.report:
+        report_text = render_valuation_report(
+            valuations, currency=args.currency, as_of=as_of
+        )
+        Path(args.report).write_text(report_text, encoding="utf-8")
+        print(f"Wrote valuation report to {args.report}")
+
     return 0
 
 

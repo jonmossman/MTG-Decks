@@ -8,7 +8,7 @@ from typing import Iterable
 from .deck import Deck, slugify
 from .importer import import_deck as import_deck_from_source
 from .rules import load_decklist
-from .valuation import DeckValuer
+from .valuation import DeckValuation, DeckValuer
 
 
 logger = logging.getLogger(__name__)
@@ -154,6 +154,8 @@ class DeckLibrary:
         *,
         currency: str = "gbp",
         resolver=None,
+        cache=None,
+        now: _dt.datetime | None = None,
     ):
         """Estimate the total value of a deck using card price lookups."""
 
@@ -161,9 +163,60 @@ class DeckLibrary:
         if deck.path is None:
             raise FileNotFoundError("Deck is missing a path to load card entries")
 
+        current_time = now or _dt.datetime.utcnow()
+        if cache is not None:
+            cached = cache.get(deck.name, currency=currency, now=current_time)
+            if cached is not None:
+                return cached
+
         card_counts, _ = load_decklist(deck.path)
         valuer = DeckValuer(resolver=resolver)
-        return valuer.value_counts(card_counts, currency=currency)
+        valuation = valuer.value_counts(card_counts, currency=currency)
+
+        if cache is not None:
+            cache.store(deck.name, valuation, as_of=current_time)
+            cache.save()
+
+        return valuation
+
+    def value_all(
+        self,
+        *,
+        currency: str = "gbp",
+        resolver=None,
+        cache=None,
+        now: _dt.datetime | None = None,
+    ) -> dict[str, DeckValuation]:
+        """Estimate the value of every deck in the library.
+
+        Returns a mapping of deck name to valuation results so callers can
+        format reports or compare how totals shift over time.
+        """
+
+        valuer = DeckValuer(resolver=resolver)
+        results: dict[str, DeckValuation] = {}
+        current_time = now or _dt.datetime.utcnow()
+
+        for path in self.deck_files():
+            deck = Deck.from_file(path)
+
+            if cache is not None:
+                cached = cache.get(deck.name, currency=currency, now=current_time)
+                if cached is not None:
+                    results[deck.name] = cached
+                    continue
+
+            card_counts, _ = load_decklist(path)
+            valuation = valuer.value_counts(card_counts, currency=currency)
+            results[deck.name] = valuation
+
+            if cache is not None:
+                cache.store(deck.name, valuation, as_of=current_time)
+
+        if cache is not None:
+            cache.save()
+
+        return results
 
     def show(self, name_or_slug: str) -> str:
         deck = self.read_deck(name_or_slug)

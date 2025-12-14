@@ -4,7 +4,7 @@ from .deck import Deck
 from .importer import CardResolver, ImportResult, ScryfallResolver, import_deck
 from .library import DeckLibrary
 from .rules import CommanderRules, load_decklist, parse_decklist
-from .valuation import DeckValuation, DeckValuer
+from .valuation import DeckValuation, DeckValuer, ValuationCache
 
 __version__ = "0.1.0"
 
@@ -18,6 +18,7 @@ __all__ = [
     "import_deck",
     "DeckValuation",
     "DeckValuer",
+    "ValuationCache",
     "__version__",
     "load_decklist",
     "parse_decklist",

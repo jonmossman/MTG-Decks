@@ -1,17 +1,17 @@
 ---
-name: The Ur-Dragon, Eternal Sky Tyrant
-commander: The Ur-Dragon
+name: Tidus, Yuna's Guardian
+commander: Tidus, Yuna's Guardian
 colors: W, U, B, R, G
-theme: Dragon tribal value
+theme: Guardian-led dragon triumph
 format: Commander
 created: 2024-01-14
 notes: Explosive turns with haste enablers and extra combat steps.
 ---
 
-# The Ur-Dragon, Eternal Sky Tyrant
+# Tidus, Yuna's Guardian
 
-**Commander:** The Ur-Dragon
-**Theme:** Dragon tribal value
+**Commander:** Tidus, Yuna's Guardian
+**Theme:** Guardian-led dragon triumph
 **Colors:** W, U, B, R, G
 **Format:** Commander
 
@@ -21,7 +21,7 @@ notes: Explosive turns with haste enablers and extra combat steps.
 - Keep interaction handy for sweepers and combo turns.
 
 ## Decklist
-- [Commander] The Ur-Dragon
+- [Commander] Tidus, Yuna's Guardian
 - Ancient Copper Dragon
 - Atarka, World Render
 - Miirym, Sentinel Wyrm

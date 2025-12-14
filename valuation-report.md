@@ -1,0 +1,184 @@
+# Deck Valuation Report
+As of: 2025-12-14T14:27:45Z
+
+This report captures the latest valuation run for the sample decks. Totals rely on
+Scryfall price lookups; in this environment the requests were blocked, so totals are
+`$0.00` and all cards are listed under "Price lookups needed" for follow-up once
+network access is available. Regenerate this snapshot anytime prices change with:
+
+```bash
+PYTHONPATH=src mtg-decks value-all --currency usd --report valuation-report.md
+```
+
+## Tidus, Yuna's Guardian
+- **Total (USD):** $0.00
+- **Price lookups needed (85):**
+  - Tidus, Yuna's Guardian
+  - Ancient Copper Dragon
+  - Atarka, World Render
+  - Miirym, Sentinel Wyrm
+  - Goldspan Dragon
+  - Terror of the Peaks
+  - Old Gnawbone
+  - Lathliss, Dragon Queen
+  - Dragonlord Ojutai
+  - Dragonlord Silumgar
+  - Dragonlord Kolaghan
+  - Dragonlord Dromoka
+  - Savage Ventmaw
+  - Utvara Hellkite
+  - Crux of Fate
+  - Temur Ascendancy
+  - Rhythm of the Wild
+  - Kindred Discovery
+  - Garruk's Uprising
+  - Elemental Bond
+  - Guardian Project
+  - The Great Henge
+  - Fist of Suns
+  - Herald's Horn
+  - Urza's Incubator
+  - Chromatic Lantern
+  - Arcane Signet
+  - Fellwar Stone
+  - Sol Ring
+  - Command Tower
+  - Path of Ancestry
+  - Haven of the Spirit Dragon
+  - The World Tree
+  - Crucible of the Spirit Dragon
+  - Temple of the Dragon Queen
+  - Frontier Bivouac
+  - Sandsteppe Citadel
+  - Opulent Palace
+  - Mystic Monastery
+  - Nomad Outpost
+  - Crumbling Necropolis
+  - Savage Lands
+  - Arcane Sanctum
+  - Jungle Shrine
+  - Seaside Citadel
+  - Command Beacon
+  - Exotic Orchard
+  - Spire Garden
+  - Rejuvenating Springs
+  - Luxury Suite
+  - Morphic Pool
+  - Bountiful Promenade
+  - Reflecting Pool
+  - Indatha Triome
+  - Jetmir's Garden
+  - Xander's Lounge
+  - Ziatora's Proving Ground
+  - Spara's Headquarters
+  - Raffine's Tower
+  - Bala Ged Recovery
+  - Bladewing the Risen
+  - Kolaghan, the Storm's Fury
+  - Karrthus, Tyrant of Jund
+  - Scourge of Valkas
+  - Thunderbreak Regent
+  - Skithiryx, the Blight Dragon
+  - Balefire Dragon
+  - Hellkite Charger
+  - Dragon Tempest
+  - Crucible of Fire
+  - Patriarch's Bidding
+  - Living Death
+  - Damnation
+  - Supreme Verdict
+  - Farseek
+  - Cultivate
+  - Kodama's Reach
+  - Nature's Lore
+  - Three Visits
+  - Skyshroud Claim
+  - Plains
+  - Island
+  - Swamp
+  - Mountain
+  - Forest
+
+## Kudo Bears
+- **Total (USD):** $0.00
+- **Price lookups needed (80):**
+  - Kudo, King Among Bears
+  - Ayula, Queen Among Bears
+  - Bearscape
+  - Words of Wilding
+  - Goreclaw, Terror of Qal Sisma
+  - Metallic Mimic
+  - Collected Company
+  - Heroic Intervention
+  - Path to Exile
+  - Swords to Plowshares
+  - Beast Within
+  - Finale of Devastation
+  - Growing Rites of Itlimoc
+  - Guardian Project
+  - Rancor
+  - Bear Umbra
+  - Kodama's Reach
+  - Cultivate
+  - Elvish Mystic
+  - Llanowar Elves
+  - Arcane Signet
+  - Sol Ring
+  - Command Tower
+  - Temple Garden
+  - Windswept Heath
+  - Boreal Druid
+  - Bloom Tender
+  - Nature's Lore
+  - Three Visits
+  - Farseek
+  - Guardian Gladewalker
+  - Bramblewood Paragon
+  - Hardened Scales
+  - Cathars' Crusade
+  - Beast Whisperer
+  - Toski, Bearer of Secrets
+  - Fell the Mighty
+  - Austere Command
+  - Vanquisher's Banner
+  - Eldrazi Monument
+  - Herald's Horn
+  - Gavony Township
+  - Canopy Vista
+  - Sunpetal Grove
+  - Wooded Bastion
+  - Bountiful Promenade
+  - Razorverge Thicket
+  - Brushland
+  - Fortified Village
+  - Overgrown Farmland
+  - Selesnya Sanctuary
+  - Myriad Landscape
+  - Evolving Wilds
+  - Terramorphic Expanse
+  - Krosan Verge
+  - Field of the Dead
+  - Yavimaya, Cradle of Growth
+  - Nykthos, Shrine to Nyx
+  - Serra Paragon
+  - Adeline, Resplendent Cathar
+  - Collective Effort
+  - Beastmaster Ascension
+  - Return of the Wildspeaker
+  - Shamanic Revelation
+  - Sigarda's Summons
+  - Divine Visitation
+  - Idyllic Tutor
+  - Enlightened Tutor
+  - Worldly Tutor
+  - Chord of Calling
+  - White Sun's Twilight
+  - Inspiring Call
+  - Flawless Maneuver
+  - Unbreakable Formation
+  - Ajani, Strength of the Pride
+  - Elspeth Resplendent
+  - Nissa, Voice of Zendikar
+  - Garruk's Uprising
+  - Plains
+  - Forest
