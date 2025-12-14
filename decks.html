@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Deck Browser</title>
+  <style>
+    :root {
+      color-scheme: dark;
+    }
+
+    body {
+      margin: 0;
+      padding: 24px;
+      background: #000;
+      color: #fff;
+      font-family: "Fira Code", "SFMono-Regular", Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      line-height: 1.6;
+    }
+
+    a {
+      color: #9cf;
+    }
+
+    a:hover,
+    a:focus-visible {
+      color: #cde3ff;
+    }
+
+    h1 {
+      margin: 0 0 12px;
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: 260px 1fr;
+      gap: 16px;
+    }
+
+    .panel {
+      border: 1px solid #222;
+      background: #0a0a0a;
+      padding: 12px;
+    }
+
+    .deck-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .deck-list button {
+      width: 100%;
+      text-align: left;
+      background: #111;
+      color: #fff;
+      border: 1px solid #333;
+      padding: 10px;
+      cursor: pointer;
+    }
+
+    .deck-list button:hover,
+    .deck-list button:focus-visible {
+      border-color: #555;
+      background: #181818;
+    }
+
+    .deck-meta {
+      font-size: 0.9rem;
+      color: #aaa;
+      margin-top: 4px;
+    }
+
+    pre {
+      white-space: pre-wrap;
+      word-break: break-word;
+      background: #050505;
+      padding: 16px;
+      border: 1px solid #222;
+      min-height: 50vh;
+      margin: 0;
+    }
+
+    .status {
+      margin-top: 8px;
+      color: #9cf;
+    }
+
+    @media (max-width: 800px) {
+      .layout {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <h1>Deck Browser</h1>
+  <p>Load markdown decklists directly from the repository and keep the plain text, black-and-white presentation.</p>
+  <div class="layout">
+    <section class="panel">
+      <ul class="deck-list" id="deckList"></ul>
+    </section>
+    <section>
+      <pre id="deckContent">Select a deck to view its contents.</pre>
+      <div class="status" id="status"></div>
+    </section>
+  </div>
+
+  <script>
+    const decks = [
+      {
+        id: "kudo-bears",
+        title: "Kudo Bears",
+        commander: "Kudo, King Among Bears",
+        file: "decks/kudo-bears.md",
+      },
+      {
+        id: "tidus-yunas-guardian",
+        title: "Tidus, Yuna's Guardian",
+        commander: "Tidus, Yuna's Guardian",
+        file: "decks/tidus-yunas-guardian.md",
+      },
+    ];
+
+    const deckList = document.getElementById("deckList");
+    const deckContent = document.getElementById("deckContent");
+    const status = document.getElementById("status");
+
+    function renderList() {
+      deckList.innerHTML = "";
+      decks.forEach((deck) => {
+        const item = document.createElement("li");
+        const button = document.createElement("button");
+        button.textContent = deck.title;
+        button.addEventListener("click", () => loadDeck(deck));
+
+        const meta = document.createElement("div");
+        meta.className = "deck-meta";
+        meta.textContent = `Commander: ${deck.commander}`;
+
+        item.append(button, meta);
+        deckList.appendChild(item);
+      });
+    }
+
+    async function loadDeck(deck) {
+      status.textContent = `Loading ${deck.title}...`;
+      deckContent.textContent = "";
+      try {
+        const response = await fetch(deck.file);
+        if (!response.ok) {
+          throw new Error(`Failed to load ${deck.file}`);
+        }
+        const text = await response.text();
+        deckContent.textContent = text.trim();
+        status.textContent = `Showing ${deck.title}`;
+      } catch (error) {
+        console.error(error);
+        deckContent.textContent = "Unable to load deck.";
+        status.textContent = error.message;
+      }
+    }
+
+    renderList();
+  </script>
+</body>
+</html>

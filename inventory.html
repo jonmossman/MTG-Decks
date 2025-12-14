@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Inventory</title>
+  <style>
+    :root {
+      color-scheme: dark;
+    }
+
+    body {
+      margin: 0;
+      padding: 24px;
+      background: #000;
+      color: #fff;
+      font-family: "Fira Code", "SFMono-Regular", Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      line-height: 1.6;
+    }
+
+    h1 {
+      margin: 0 0 12px;
+    }
+
+    .controls {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+
+    input,
+    select {
+      background: #0a0a0a;
+      color: #fff;
+      border: 1px solid #333;
+      padding: 8px;
+      font-family: inherit;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background: #050505;
+    }
+
+    th,
+    td {
+      border: 1px solid #222;
+      padding: 8px;
+      text-align: left;
+    }
+
+    th button {
+      background: transparent;
+      color: inherit;
+      border: none;
+      cursor: pointer;
+      padding: 0;
+      font: inherit;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    th button:hover,
+    th button:focus-visible {
+      color: #cde3ff;
+    }
+
+    .status {
+      margin-top: 8px;
+      color: #9cf;
+    }
+  </style>
+</head>
+<body>
+  <h1>Spare Card Inventory</h1>
+  <p>Search, sort, and filter the markdown inventory while keeping the plain text aesthetic.</p>
+
+  <div class="controls">
+    <label>
+      Search:
+      <input id="search" type="text" placeholder="Name, box, or type" />
+    </label>
+    <label>
+      Box:
+      <select id="boxFilter"></select>
+    </label>
+    <label>
+      Type:
+      <select id="typeFilter"></select>
+    </label>
+  </div>
+
+  <table>
+    <thead>
+      <tr>
+        <th><button data-sort="name">Name</button></th>
+        <th><button data-sort="count">Count</button></th>
+        <th><button data-sort="box">Box</button></th>
+        <th><button data-sort="cmc">CMC</button></th>
+        <th><button data-sort="type">Type</button></th>
+        <th><button data-sort="unitValue">Unit Value</button></th>
+        <th><button data-sort="totalValue">Total Value</button></th>
+      </tr>
+    </thead>
+    <tbody id="tableBody"></tbody>
+  </table>
+
+  <div class="status" id="status">Loading inventory...</div>
+
+  <script>
+    const searchInput = document.getElementById("search");
+    const boxFilter = document.getElementById("boxFilter");
+    const typeFilter = document.getElementById("typeFilter");
+    const tableBody = document.getElementById("tableBody");
+    const status = document.getElementById("status");
+
+    let inventory = [];
+    let sortField = "name";
+    let sortDirection = "asc";
+
+    async function loadInventory() {
+      try {
+        const response = await fetch("inventory.md");
+        if (!response.ok) {
+          throw new Error("Unable to load inventory.md");
+        }
+        const text = await response.text();
+        inventory = parseInventory(text);
+        populateFilters();
+        render();
+        status.textContent = `Loaded ${inventory.length} entries.`;
+      } catch (error) {
+        console.error(error);
+        status.textContent = error.message;
+      }
+    }
+
+    function parseInventory(markdown) {
+      const lines = markdown.split(/\r?\n/);
+      const headerDividerIndex = lines.findIndex((line) => line.trim().startsWith("| ---"));
+      if (headerDividerIndex === -1) return [];
+      const dataLines = lines.slice(headerDividerIndex + 1).filter((line) => line.trim().startsWith("|"));
+      return dataLines
+        .map((line) => line.split("|").slice(1, -1).map((cell) => cell.trim()))
+        .filter((cells) => cells.length >= 7 && cells[0])
+        .map((cells) => ({
+          name: cells[0],
+          count: parseNumber(cells[1]),
+          box: cells[2],
+          cmc: parseNumber(cells[3]),
+          type: cells[4],
+          unitValue: cells[5],
+          totalValue: cells[6],
+        }));
+    }
+
+    function parseNumber(value) {
+      const num = Number(value);
+      return Number.isFinite(num) ? num : value;
+    }
+
+    function populateFilters() {
+      const boxes = Array.from(new Set(inventory.map((item) => item.box))).filter(Boolean).sort();
+      const types = Array.from(new Set(inventory.map((item) => item.type))).filter(Boolean).sort();
+      fillSelect(boxFilter, boxes, "All boxes");
+      fillSelect(typeFilter, types, "All types");
+    }
+
+    function fillSelect(select, options, placeholder) {
+      select.innerHTML = "";
+      const allOption = document.createElement("option");
+      allOption.value = "";
+      allOption.textContent = placeholder;
+      select.appendChild(allOption);
+      options.forEach((value) => {
+        const option = document.createElement("option");
+        option.value = value;
+        option.textContent = value;
+        select.appendChild(option);
+      });
+    }
+
+    function render() {
+      const searchTerm = searchInput.value.trim().toLowerCase();
+      const box = boxFilter.value;
+      const type = typeFilter.value;
+
+      const filtered = inventory.filter((item) => {
+        const matchesSearch = searchTerm
+          ? [item.name, item.box, item.type].some((field) => (field || "").toLowerCase().includes(searchTerm))
+          : true;
+        const matchesBox = box ? item.box === box : true;
+        const matchesType = type ? item.type === type : true;
+        return matchesSearch && matchesBox && matchesType;
+      });
+
+      filtered.sort((a, b) => {
+        const direction = sortDirection === "asc" ? 1 : -1;
+        const aValue = a[sortField];
+        const bValue = b[sortField];
+        if (typeof aValue === "number" && typeof bValue === "number") {
+          return (aValue - bValue) * direction;
+        }
+        return String(aValue).localeCompare(String(bValue)) * direction;
+      });
+
+      tableBody.innerHTML = filtered
+        .map(
+          (item) => `
+          <tr>
+            <td>${item.name}</td>
+            <td>${item.count}</td>
+            <td>${item.box}</td>
+            <td>${item.cmc}</td>
+            <td>${item.type}</td>
+            <td>${item.unitValue}</td>
+            <td>${item.totalValue}</td>
+          </tr>
+        `
+        )
+        .join("");
+
+      status.textContent = filtered.length ? `${filtered.length} item(s) shown.` : "No matching cards.";
+    }
+
+    function setSort(field) {
+      if (sortField === field) {
+        sortDirection = sortDirection === "asc" ? "desc" : "asc";
+      } else {
+        sortField = field;
+        sortDirection = "asc";
+      }
+      render();
+    }
+
+    document.querySelectorAll("th button").forEach((button) => {
+      button.addEventListener("click", () => setSort(button.dataset.sort));
+    });
+
+    searchInput.addEventListener("input", render);
+    boxFilter.addEventListener("change", render);
+    typeFilter.addEventListener("change", render);
+
+    loadInventory();
+  </script>
+</body>
+</html>

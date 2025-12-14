@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
+import math
 from pathlib import Path
 from typing import Iterable
 
@@ -220,7 +221,8 @@ def _safe_int(value: str) -> int:
 
 def _safe_float(value: str) -> float | None:
     try:
-        return float(value)
+        parsed = float(value)
+        return parsed if math.isfinite(parsed) else None
     except (TypeError, ValueError):
         return None
 
