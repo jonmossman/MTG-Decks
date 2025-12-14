@@ -43,6 +43,7 @@ Created: 2024-06-21
 | `mtg-decks create <name> <commander> [--colors ...] [--theme ...] [--notes ...] [--format ...] [--template path]` | Write a new Markdown deck with optional templated body content. Fails if the file already exists. |
 | `mtg-decks import <name> <commander> --cards <text> | --file <csv>` | Fuzzy-match card entries against Scryfall, generate a decklist, and write/update a Markdown file (use `--overwrite` to replace an existing file). |
 | `mtg-decks value <name-or-slug> [--currency GBP]` | Sum card prices via Scryfall price fields (`gbp`, `usd`, `eur`, etc.) and report missing values. |
+| `mtg-decks validate [--log validation.log] [--deck-size 100] [--ban CARD]...` | Validate deck files against Commander rules and optionally write a fresh log file on each run. |
 
 Add `--dir PATH` to any command to work against a different deck folder. Check the tool version with `mtg-decks --version`.
 
@@ -149,6 +150,13 @@ print("Missing prices:", valuation.missing_prices)
 - **Offline workflows**: The importer and valuer accept custom resolvers; plug in a local cache or fixture data when traveling or running CI without internet access so commands keep working.
 - **Change control**: Treat `decks/` like source code—review diffs of generated Markdown, keep validation logs in CI artifacts, and run `pytest` on pull requests to catch rule violations before merging.
 - **Data provenance**: When fuzzy matching card names, keep the original CSV/text around for auditability and note any resolver warnings in commit messages or deck notes so you remember which entries were guesses.
+
+## Handling merge conflicts
+If you pull or merge and see `CONFLICT` messages, it usually means the same deck Markdown or README section changed on both branches.
+
+- Run `git status` to see the conflicted files, then `git diff --merge <file>` to view conflict markers.
+- Keep the up-to-date command/validation docs from `README.md` and re-run `PYTHONPATH=src pytest` after fixing conflicts.
+- For deck files, ensure the final file still has 100 cards, required commander tags, and valid front matter before committing.
 
 ## Developing and testing
 - Run the test suite: `PYTHONPATH=src pytest`

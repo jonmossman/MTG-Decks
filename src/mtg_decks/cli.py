@@ -6,6 +6,7 @@ from pathlib import Path
 
 from . import __version__
 from .library import DeckLibrary
+from .rules import CommanderRules
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -105,6 +106,51 @@ def build_parser() -> argparse.ArgumentParser:
     )
     value_parser.set_defaults(func=cmd_value)
 
+    validate_parser = subparsers.add_parser(
+        "validate", help="Validate deck files against Commander rules"
+    )
+    validate_parser.add_argument(
+        "--log",
+        type=Path,
+        dest="log_path",
+        help="Optional log file to write results (overwrites on each run)",
+    )
+    validate_parser.add_argument(
+        "--deck-size",
+        type=int,
+        default=100,
+        help="Expected card count for the decklist (default: 100)",
+    )
+    validate_parser.add_argument(
+        "--expected-format",
+        default="Commander",
+        help="Expected deck format name (default: Commander)",
+    )
+    validate_parser.add_argument(
+        "--max-commanders",
+        type=int,
+        default=1,
+        help="Maximum number of commander entries allowed (default: 1)",
+    )
+    validate_parser.add_argument(
+        "--allow-missing-commander-tag",
+        action="store_true",
+        help="Do not require commander entries to be tagged in the decklist",
+    )
+    validate_parser.add_argument(
+        "--no-duplicate-basics",
+        action="store_true",
+        help="Flag duplicate basics as errors instead of allowing them",
+    )
+    validate_parser.add_argument(
+        "--ban",
+        action="append",
+        dest="banned_cards",
+        default=[],
+        help="Card name to ban (repeat for multiple entries)",
+    )
+    validate_parser.set_defaults(func=cmd_validate)
+
     return parser
 
 
@@ -203,6 +249,27 @@ def cmd_value(args: argparse.Namespace) -> int:
         print("Missing prices for:")
         for name in sorted(valuation.missing_prices):
             print(f"- {name}")
+    return 0
+
+
+def cmd_validate(args: argparse.Namespace) -> int:
+    rules = CommanderRules(
+        deck_size=args.deck_size,
+        expected_format=args.expected_format,
+        allow_duplicate_basics=not args.no_duplicate_basics,
+        require_commander_tag=not args.allow_missing_commander_tag,
+        max_commander_entries=args.max_commanders,
+        banned_cards=set(args.banned_cards),
+    )
+
+    library = DeckLibrary(args.deck_dir)
+    errors = library.validate_decks(log_path=args.log_path, rules=rules)
+    if errors:
+        for line in errors:
+            print(line, file=sys.stderr)
+        return 1
+
+    print("All decks valid.")
     return 0
 
 

@@ -167,3 +167,84 @@ def test_cli_value_reports_total_and_missing(
     assert exit_code == 0
     assert "Total value (GBP): £10.00" in output
     assert "Arcane Signet" in output
+
+
+def test_cli_validate_reports_success_and_writes_log(
+    deck_dir: Path, tmp_path: Path, capsys: pytest.CaptureFixture[str]
+):
+    deck_dir.mkdir(parents=True, exist_ok=True)
+    deck = deck_dir / "valid.md"
+    deck.write_text(
+        "\n".join(
+            [
+                "---",
+                "name: Valid Deck",
+                "commander: Test Commander",
+                "format: Commander",
+                "---",
+                "",
+                "## Decklist",
+                "- [Commander] Test Commander",
+                "- Arcane Signet",
+            ]
+        ),
+        encoding="utf-8",
+    )
+
+    log_path = tmp_path / "validation.log"
+    exit_code = cli.main(
+        [
+            "--dir",
+            str(deck_dir),
+            "validate",
+            "--deck-size",
+            "2",
+            "--log",
+            str(log_path),
+        ]
+    )
+
+    assert exit_code == 0
+    assert "All decks valid." in capsys.readouterr().out
+    assert log_path.read_text(encoding="utf-8").strip() == "All decks valid."
+
+
+def test_cli_validate_reports_errors_with_rules(deck_dir: Path, capsys: pytest.CaptureFixture[str]):
+    deck_dir.mkdir(parents=True, exist_ok=True)
+    deck = deck_dir / "invalid.md"
+    deck.write_text(
+        "\n".join(
+            [
+                "---",
+                "name: Invalid Deck",
+                "commander: Test Commander",
+                "format: Commander",
+                "---",
+                "",
+                "## Decklist",
+                "- [Commander] Not The Commander",
+                "- Arcane Signet",
+                "- Black Lotus",
+            ]
+        ),
+        encoding="utf-8",
+    )
+
+    exit_code = cli.main(
+        [
+            "--dir",
+            str(deck_dir),
+            "validate",
+            "--deck-size",
+            "3",
+            "--ban",
+            "Black Lotus",
+            "--max-commanders",
+            "2",
+        ]
+    )
+
+    captured = capsys.readouterr()
+    assert exit_code == 1
+    assert "Black Lotus" in captured.err
+    assert "Commander 'Test Commander' not marked" in captured.err
