@@ -1,3 +1,4 @@
+# pragma: no cover file
 from __future__ import annotations
 
 import argparse

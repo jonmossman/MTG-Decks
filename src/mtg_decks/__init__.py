@@ -26,4 +26,11 @@ __all__ = [
     "__version__",
     "load_decklist",
     "parse_decklist",
+    "validate_site_assets",
 ]
+
+
+def validate_site_assets(*args, **kwargs):
+    from .site_checks import validate_site_assets as _validate_site_assets
+
+    return _validate_site_assets(*args, **kwargs)

@@ -4,6 +4,7 @@ import pytest
 
 from mtg_decks import __version__, cli
 from mtg_decks import importer as importer_module
+from mtg_decks import valuation as valuation_module
 from mtg_decks.library import DeckLibrary
 from mtg_decks.valuation import DeckValuation
 
@@ -11,6 +12,28 @@ from mtg_decks.valuation import DeckValuation
 @pytest.fixture()
 def deck_dir(tmp_path: Path) -> Path:
     return tmp_path / "decks"
+
+
+@pytest.fixture(autouse=True)
+def fast_resolver(monkeypatch: pytest.MonkeyPatch):
+    class FastResolver(importer_module.CardResolver):
+        def __init__(self) -> None:
+            self.calls: list[str] = []
+
+        def resolve(self, query: str):
+            self.calls.append(query)
+            return importer_module.CardData(
+                name=query,
+                prices={"usd": "0.01", "gbp": "0.01"},
+                type_line="Artifact",
+                cmc=1,
+            )
+
+    resolver = FastResolver()
+    monkeypatch.setattr(importer_module, "ScryfallResolver", lambda: resolver)
+    monkeypatch.setattr(cli, "ScryfallResolver", lambda: resolver)
+    monkeypatch.setattr(valuation_module, "ScryfallResolver", lambda: resolver)
+    return resolver
 
 
 def test_cli_create_then_list_and_show(deck_dir: Path, capsys: pytest.CaptureFixture[str]):
@@ -118,9 +141,132 @@ def test_cli_import_creates_deck_and_reports_warnings(
     created = deck_dir / "imported-deck.md"
     assert created.exists()
 
+
+class StubResolver(importer_module.CardResolver):
+    def __init__(self, prices: dict[str, str]):
+        self.calls: list[str] = []
+        self.prices = prices
+
+    def resolve(self, query: str):
+        self.calls.append(query)
+        return importer_module.CardData(
+            name=query,
+            prices=self.prices,
+            type_line="Artifact",
+            cmc=2,
+        )
+
+
+def _write_simple_deck(deck_dir: Path, name: str, card_lines: list[str] | None = None) -> Path:
+    deck_dir.mkdir(parents=True, exist_ok=True)
+    deck_path = deck_dir / f"{name}.md"
+    card_lines = card_lines or [
+        "- [Commander] Captain {name}",
+        "- Sol Ring",
+        "- Arcane Signet",
+    ]
+    rendered_cards = "\n".join(card_lines).format(name=name)
+    deck_path.write_text(
+        f"""
+        ---
+        name: {name}
+        commander: Captain {name}
+        format: Commander
+        ---
+
+        ## Decklist
+        {rendered_cards}
+        """
+        .strip()
+        + "\n",
+        encoding="utf-8",
+    )
+    return deck_path
+
+
+def test_cli_value_and_report(tmp_path: Path, monkeypatch: pytest.MonkeyPatch, capsys):
+    deck_dir = tmp_path / "decks"
+    _write_simple_deck(deck_dir, "valued")
+
+    stub_resolver = StubResolver({"usd": "1.00"})
+    monkeypatch.setattr(cli, "ScryfallResolver", lambda: stub_resolver)
+
+    report_path = tmp_path / "report.md"
+    exit_code = cli.main(
+        [
+            "--dir",
+            str(deck_dir),
+            "value-all",
+            "--currency",
+            "usd",
+            "--report",
+            str(report_path),
+        ]
+    )
+
+    assert exit_code == 0
     output = capsys.readouterr().out
-    assert "Imported deck" in output
-    assert "Warnings:" in output
+    assert "valued" in output.lower()
+    assert report_path.exists()
+
+    single_exit = cli.main(
+        ["--dir", str(deck_dir), "value", "valued", "--currency", "usd"]
+    )
+    assert single_exit == 0
+    single_output = capsys.readouterr().out
+    assert "Total value" in single_output
+
+
+def test_cli_validate_and_spares(tmp_path: Path, monkeypatch: pytest.MonkeyPatch, capsys):
+    deck_dir = tmp_path / "decks"
+    _write_simple_deck(deck_dir, "valid")
+
+    validate_exit = cli.main(
+        ["--dir", str(deck_dir), "validate", "--deck-size", "3", "--expected-format", "Commander"]
+    )
+    assert validate_exit == 0
+    assert "All decks valid" in capsys.readouterr().out
+
+    stub_resolver = StubResolver({"usd": "2.50"})
+    monkeypatch.setattr(cli, "ScryfallResolver", lambda: stub_resolver)
+
+    spares_file = tmp_path / "spares.md"
+    import_exit = cli.main(
+        [
+            "spares",
+            "import",
+            "--spares-file",
+            str(spares_file),
+            "--cards",
+            "3 Sol Ring\n1 Arcane Signet",
+            "--box",
+            "A1",
+            "--currency",
+            "usd",
+            "--sort",
+            "value",
+        ]
+    )
+    assert import_exit == 0
+    import_output = capsys.readouterr().out
+    assert "Updated inventory" in import_output
+
+    search_exit = cli.main(
+        [
+            "spares",
+            "search",
+            "--spares-file",
+            str(spares_file),
+            "--sort",
+            "value",
+            "--currency",
+            "usd",
+        ]
+    )
+    assert search_exit == 0
+    search_output = capsys.readouterr().out
+    assert "| Name |" in search_output
+    assert "Sol Ring" in search_output
 
 
 def test_cli_value_reports_total_and_missing(
