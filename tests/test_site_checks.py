@@ -27,3 +27,15 @@ def test_missing_asset_is_logged(tmp_path: Path):
     contents = log_path.read_text(encoding="utf-8")
     assert "upload.html" in contents
     assert "Missing site asset" in contents
+
+
+def test_missing_site_root_is_logged(tmp_path: Path):
+    site_root = tmp_path / "site"
+    log_path = tmp_path / "error.log"
+
+    result = validate_site_assets(site_root=site_root, log_path=log_path)
+
+    assert result is False
+    contents = log_path.read_text(encoding="utf-8")
+    assert "Site root does not exist" in contents
+    assert str(site_root) in contents

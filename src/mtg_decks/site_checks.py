@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import logging
+import sys
 from pathlib import Path
 
 from .spec_sync import DEFAULT_ERROR_LOG, SITE_ROOT
@@ -23,9 +24,17 @@ def _configure_logger(log_path: Path) -> logging.Logger:
 
     logger = logging.getLogger("mtg_decks.site_checks")
     logger.handlers.clear()
-    handler = logging.FileHandler(log_path, encoding="utf-8")
-    handler.setFormatter(logging.Formatter("%(levelname)s %(message)s"))
-    logger.addHandler(handler)
+
+    formatter = logging.Formatter("%(levelname)s %(message)s")
+
+    file_handler = logging.FileHandler(log_path, encoding="utf-8")
+    file_handler.setFormatter(formatter)
+    logger.addHandler(file_handler)
+
+    stream_handler = logging.StreamHandler(sys.stderr)
+    stream_handler.setFormatter(formatter)
+    logger.addHandler(stream_handler)
+
     logger.setLevel(logging.INFO)
     logger.propagate = False
     return logger
@@ -35,6 +44,12 @@ def validate_site_assets(site_root: Path = SITE_ROOT, log_path: Path = DEFAULT_E
     """Ensure the published HTML assets exist and log a useful error when any are missing."""
 
     logger = _configure_logger(log_path)
+    logger.info("Checking site assets in %s", site_root)
+
+    if not site_root.exists():
+        logger.error("Site root does not exist: %s", site_root)
+        return False
+
     missing: list[Path] = []
 
     for rel_path in REQUIRED_SITE_FILES:
@@ -43,6 +58,7 @@ def validate_site_assets(site_root: Path = SITE_ROOT, log_path: Path = DEFAULT_E
             missing.append(candidate)
 
     if missing:
+        logger.error("Found %s missing site asset(s)", len(missing))
         for path in missing:
             logger.error("Missing site asset: %s", path)
         return False

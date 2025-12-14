@@ -5,7 +5,6 @@ from .importer import CardResolver, ImportResult, ScryfallResolver, import_deck
 from .inventory import SpareCard, SparesInventory, build_spare_cards
 from .library import DeckLibrary
 from .rules import CommanderRules, load_decklist, parse_decklist
-from .site_checks import validate_site_assets
 from .valuation import DeckValuation, DeckValuer, ValuationCache
 
 __version__ = "0.1.0"
@@ -24,8 +23,14 @@ __all__ = [
     "DeckValuation",
     "DeckValuer",
     "ValuationCache",
-    "validate_site_assets",
     "__version__",
     "load_decklist",
     "parse_decklist",
+    "validate_site_assets",
 ]
+
+
+def validate_site_assets(*args, **kwargs):
+    from .site_checks import validate_site_assets as _validate_site_assets
+
+    return _validate_site_assets(*args, **kwargs)
