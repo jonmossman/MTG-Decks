@@ -16,8 +16,15 @@ class FakeResolver(importer.CardResolver):
 
 
 def test_parse_import_rows_handles_csv_and_lines():
-    rows = importer.parse_import_rows("2, Sol Ring\n1 Arcane Signet\nMystic Remora")
-    assert rows == [(2, "Sol Ring"), (1, "Arcane Signet"), (1, "Mystic Remora")]
+    rows = importer.parse_import_rows(
+        "2, Sol Ring\n4x Arcane Signet\n1 Arcane Signet\nMystic Remora"
+    )
+    assert rows == [
+        (2, "Sol Ring"),
+        (4, "Arcane Signet"),
+        (1, "Arcane Signet"),
+        (1, "Mystic Remora"),
+    ]
 
 
 def test_import_deck_normalizes_names_and_infers_colors(tmp_path: Path):
