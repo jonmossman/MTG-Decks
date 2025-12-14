@@ -7,47 +7,139 @@
   <style>
     :root {
       color-scheme: dark;
+      --bg: #060608;
+      --panel: #0f1116;
+      --border: #1c1f27;
+      --accent: #71c9f8;
+      --accent-strong: #9ae7ff;
+      --text: #f1f5ff;
+      --muted: #a4b3cc;
+    }
+
+    * {
+      box-sizing: border-box;
     }
 
     body {
       margin: 0;
-      padding: 24px;
-      background: #000;
-      color: #fff;
-      font-family: "Fira Code", "SFMono-Regular", Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      min-height: 100vh;
+      background: radial-gradient(circle at 10% 15%, rgba(113, 201, 248, 0.08), transparent 25%),
+        radial-gradient(circle at 80% -10%, rgba(154, 231, 255, 0.08), transparent 22%),
+        var(--bg);
+      color: var(--text);
+      font-family: "Inter", "SF Pro Text", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
       line-height: 1.6;
+      padding: 28px 16px 42px;
+    }
+
+    a {
+      color: var(--accent);
+    }
+
+    a:hover,
+    a:focus-visible {
+      color: var(--accent-strong);
+    }
+
+    .page {
+      max-width: 1100px;
+      margin: 0 auto;
+      display: grid;
+      gap: 16px;
+    }
+
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+      background: rgba(255, 255, 255, 0.02);
+      border: 1px solid var(--border);
+      padding: 12px 16px;
+      border-radius: 12px;
+    }
+
+    .brand {
+      font-weight: 700;
+      letter-spacing: 0.3px;
+    }
+
+    .button {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 9px 12px;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      background: rgba(255, 255, 255, 0.02);
+      color: var(--text);
+      text-decoration: none;
+      font-weight: 600;
+      transition: transform 120ms ease, border-color 120ms ease, background 120ms ease;
+    }
+
+    .button:hover,
+    .button:focus-visible {
+      transform: translateY(-1px);
+      border-color: #2a2f3b;
+      background: rgba(113, 201, 248, 0.08);
     }
 
     h1 {
-      margin: 0 0 12px;
+      margin: 0;
+      letter-spacing: 0.3px;
+    }
+
+    p.lead {
+      margin: 0;
+      color: var(--muted);
+    }
+
+    .panel {
+      border: 1px solid var(--border);
+      background: var(--panel);
+      padding: 14px;
+      border-radius: 12px;
+      box-shadow: 0 14px 36px rgba(0, 0, 0, 0.32);
     }
 
     .controls {
       display: flex;
       flex-wrap: wrap;
-      gap: 8px;
+      gap: 10px;
       margin-bottom: 12px;
+    }
+
+    .controls label {
+      display: grid;
+      gap: 4px;
+      font-size: 0.95rem;
+      color: var(--muted);
     }
 
     input,
     select {
-      background: #0a0a0a;
+      background: #111420;
       color: #fff;
-      border: 1px solid #333;
-      padding: 8px;
+      border: 1px solid var(--border);
+      padding: 9px;
+      border-radius: 10px;
       font-family: inherit;
     }
 
     table {
       width: 100%;
       border-collapse: collapse;
-      background: #050505;
+      background: #0a0d15;
+      border-radius: 12px;
+      overflow: hidden;
     }
 
     th,
     td {
-      border: 1px solid #222;
-      padding: 8px;
+      border: 1px solid var(--border);
+      padding: 10px 8px;
       text-align: left;
     }
 
@@ -60,55 +152,69 @@
       font: inherit;
       display: inline-flex;
       align-items: center;
-      gap: 4px;
+      gap: 6px;
     }
 
     th button:hover,
     th button:focus-visible {
-      color: #cde3ff;
+      color: var(--accent-strong);
     }
 
     .status {
       margin-top: 8px;
-      color: #9cf;
+      color: var(--accent);
     }
   </style>
 </head>
 <body>
-  <h1>Spare Card Inventory</h1>
-  <p>Search, sort, and filter the markdown inventory while keeping the plain text aesthetic.</p>
+  <div class="page">
+    <div class="topbar">
+      <div class="brand">Inventory</div>
+      <div class="nav">
+        <a class="button" href="index.html">Home</a>
+        <a class="button" href="decks.html">Deck Browser</a>
+      </div>
+    </div>
 
-  <div class="controls">
-    <label>
-      Search:
-      <input id="search" type="text" placeholder="Name, box, or type" />
-    </label>
-    <label>
-      Box:
-      <select id="boxFilter"></select>
-    </label>
-    <label>
-      Type:
-      <select id="typeFilter"></select>
-    </label>
+    <div class="panel">
+      <h1>Search your spare cards in seconds.</h1>
+      <p class="lead">Type to search by name, box, or type. Sort any column, and filter by storage box or card type.</p>
+    </div>
+
+    <div class="panel">
+      <div class="controls">
+        <label>
+          Search
+          <input id="search" type="text" placeholder="Name, box, or type" />
+        </label>
+        <label>
+          Box
+          <select id="boxFilter"></select>
+        </label>
+        <label>
+          Type
+          <select id="typeFilter"></select>
+        </label>
+      </div>
+
+      <table>
+        <thead>
+          <tr>
+            <th><button data-sort="name">Name</button></th>
+            <th><button data-sort="count">Count</button></th>
+            <th><button data-sort="box">Box</button></th>
+            <th><button data-sort="cmc">CMC</button></th>
+            <th><button data-sort="type">Type</button></th>
+            <th><button data-sort="unitValue">Unit Value</button></th>
+            <th><button data-sort="totalValue">Total Value</button></th>
+          </tr>
+        </thead>
+        <tbody id="tableBody"></tbody>
+      </table>
+
+      <div class="status" id="status">Loading inventory...</div>
+    </div>
   </div>
-
-  <table>
-    <thead>
-      <tr>
-        <th><button data-sort="name">Name</button></th>
-        <th><button data-sort="count">Count</button></th>
-        <th><button data-sort="box">Box</button></th>
-        <th><button data-sort="cmc">CMC</button></th>
-        <th><button data-sort="type">Type</button></th>
-        <th><button data-sort="unitValue">Unit Value</button></th>
-        <th><button data-sort="totalValue">Total Value</button></th>
-      </tr>
-    </thead>
-    <tbody id="tableBody"></tbody>
-  </table>
-
-  <div class="status" id="status">Loading inventory...</div>
 
   <script>
     const searchInput = document.getElementById("search");
