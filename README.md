@@ -193,6 +193,10 @@ mtg-decks spares search --box "Staples" --box "Cube Box" --sort cmc
 ```
 Search matches names, type lines, and box labels, and you can order results by name, total value, or CMC. Missing prices are called out so you know which cards need manual values.
 
+Inventory path tips:
+- Pass `--spares-file inventory.md` (or another path) to reuse an existing Markdown ledger.
+- The tool preserves your currency preference in the file header and rewrites the table with updated prices on every import.
+
 ### Configuring valuation defaults
 - `MTG_DECKS_CURRENCY`: default pricing currency (e.g., `USD`, `EUR`, `GBP`).
 - `MTG_DECKS_VALUATION_SOURCE`: preferred price source (defaults to `scryfall`).
