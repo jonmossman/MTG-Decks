@@ -7,7 +7,8 @@ from pathlib import Path
 # If you intentionally change an HTML page, update the hash map below once
 # the new version is merged to main.
 EXPECTED_SHA256 = {
-    "index.html": "1ab239f4f5ca04c0adb2abb606363359c9e66ccb89939c05755fa44e0e8d1893",
+    "index.html": "5dac7105e0fc9ed5b44699d4d6ad40e80747855c9c2cf05bdeadcd4b49f9cf37",
+    "upload.html": "11c1e198f686af066366fc90fdbae80e5984bb81e73f8d092fc7c172871b812b",
     "decks.html": "5f78657dd5127a6c57d994761f869de57b11d942b41104f2f3536db626aa7214",
     "inventory.html": "7ba446dadceedd2d14ea1ca6315ce22c9e3ddb29712c38c4578c188ffc0d67b0",
     "functional-spec.html": "516c018082ae3bce3f38f6e50124016cf7e6965574d9406452df1fc03f987602",

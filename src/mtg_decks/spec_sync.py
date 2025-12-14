@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from argparse import ArgumentParser
 from pathlib import Path
+import sys
 from typing import Optional
 
 import html
@@ -397,6 +398,34 @@ def write_error(message: str, error_log: Path = DEFAULT_ERROR_LOG) -> None:
     error_log.write_text(f"{existing}{message}\n", encoding="utf-8")
 
 
+def resolve_markdown_source(md_path: Path = DEFAULT_MD_PATH) -> Path:
+    """Resolve the markdown source path, preferring a local copy when packaged defaults are missing."""
+
+    if md_path.exists():
+        return md_path
+
+    if md_path.name == DEFAULT_MD_PATH.name:
+        local_md = Path.cwd() / md_path.name
+        if local_md.exists():
+            return local_md
+
+    raise FileNotFoundError(
+        f"Markdown source not found at {md_path}. Provide --md to point to FUNCTIONAL_SPEC.md."
+    )
+
+
+def resolve_html_target(html_path: Path = DEFAULT_HTML_PATH) -> Path:
+    """Resolve the HTML target path, avoiding writes inside site-packages when packaged defaults are missing."""
+
+    if html_path.exists():
+        return html_path
+
+    if html_path.name == DEFAULT_HTML_PATH.name:
+        return Path.cwd() / html_path.name
+
+    return html_path
+
+
 def spec_is_in_sync(
     md_path: Path = DEFAULT_MD_PATH,
     html_path: Path = DEFAULT_HTML_PATH,
@@ -404,9 +433,17 @@ def spec_is_in_sync(
 ) -> bool:
     """Check whether the HTML spec matches the markdown source, logging when it does not."""
 
-    markdown_text = md_path.read_text(encoding="utf-8")
+    markdown_path = resolve_markdown_source(md_path)
+    html_target = resolve_html_target(html_path)
+
+    if not html_target.exists():
+        raise FileNotFoundError(
+            f"Rendered HTML not found at {html_target}. Regenerate it with --write before checking."
+        )
+
+    markdown_text = markdown_path.read_text(encoding="utf-8")
     generated_html = render_spec_html(markdown_text)
-    current_html = html_path.read_text(encoding="utf-8")
+    current_html = html_target.read_text(encoding="utf-8")
 
     if generated_html != current_html:
         write_error("functional-spec.html is out of sync with FUNCTIONAL_SPEC.md", error_log)
@@ -418,14 +455,17 @@ def spec_is_in_sync(
 def rewrite_markdown(md_path: Path = DEFAULT_MD_PATH) -> None:
     """Rewrite the markdown file to ensure consistent newlines and formatting."""
 
-    current_text = md_path.read_text(encoding="utf-8")
-    md_path.write_text(normalize_markdown(current_text), encoding="utf-8")
+    markdown_path = resolve_markdown_source(md_path)
+    current_text = markdown_path.read_text(encoding="utf-8")
+    markdown_path.write_text(normalize_markdown(current_text), encoding="utf-8")
 
 
 def regenerate_html(md_path: Path = DEFAULT_MD_PATH, html_path: Path = DEFAULT_HTML_PATH) -> None:
     """Regenerate the HTML artifact from markdown."""
 
-    html_path.write_text(render_spec_html(md_path.read_text(encoding="utf-8")), encoding="utf-8")
+    markdown_path = resolve_markdown_source(md_path)
+    html_target = resolve_html_target(html_path)
+    html_target.write_text(render_spec_html(markdown_path.read_text(encoding="utf-8")), encoding="utf-8")
 
 
 def parse_args(args: Optional[list[str]] = None) -> ArgumentParser:
@@ -443,16 +483,20 @@ def main(argv: Optional[list[str]] = None) -> int:
     parser = parse_args()
     options = parser.parse_args(argv)
 
-    if options.rewrite_md:
-        rewrite_markdown(options.md)
+    try:
+        if options.rewrite_md:
+            rewrite_markdown(options.md)
 
-    if options.write:
-        regenerate_html(options.md, options.html)
+        if options.write:
+            regenerate_html(options.md, options.html)
 
-    if options.check:
-        return 0 if spec_is_in_sync(options.md, options.html, options.error_log) else 1
+        if options.check:
+            return 0 if spec_is_in_sync(options.md, options.html, options.error_log) else 1
 
-    return 0
+        return 0
+    except FileNotFoundError as exc:
+        print(f"[spec-sync] {exc}", file=sys.stderr)
+        return 1
 
 
 if __name__ == "__main__":  # pragma: no cover

@@ -31,9 +31,10 @@ mtg-decks value "Tidus, Yuna's Guardian" --currency gbp
 The repository includes a minimal Pages-friendly frontend so you can browse decks and inventory without leaving plain text. The
 HTML lives at the repository root:
 
-- `index.html`: links to decks, inventory, README, the functional spec, and valuation report.
+- `index.html`: links to decks, inventory, README, the functional spec, upload guide, and valuation report.
 - `decks.html`: lists deck files and fetches their raw markdown.
 - `inventory.html`: loads `inventory.md` and adds search/sort/filter controls over the table.
+- `upload.html`: a step-by-step guide for adding, amending, or removing decks and inventory entries.
 
 To publish on GitHub Pages:
 
@@ -41,6 +42,23 @@ To publish on GitHub Pages:
 2. Keep the provided `.nojekyll` file so raw `.md` assets are served to the browser.
 3. Update the hard-coded deck list in `decks.html` to match your files by adjusting the `file` paths (e.g., `decks/<slug>.md`).
 4. Commit `inventory.md` so `inventory.html` can parse the table and populate the filters.
+
+### Keeping the Pages content fresh
+Use this checklist when you add a new deck or update the spare-card inventory so the GitHub Pages views stay in sync:
+
+- **Add or update deck files**
+  - Save the Markdown deck to `decks/<slug>.md` with the same filename the CLI expects (e.g., `mtg-decks show <slug>`).
+  - Open `decks.html` and append an entry to the `decks` array with `id`, `title`, `commander`, and `file` pointing at your new Markdown path.
+  - Commit both the Markdown deck and the `decks.html` edit so Pages can fetch the file.
+- **Refresh the inventory table**
+  - Edit `inventory.md` to add or adjust rows in the Markdown table (the browser pulls directly from this file).
+  - Keep the header row intact so the search, filter, and sort controls continue to work.
+  - Commit the updated `inventory.md` so `inventory.html` reflects the new cards on the next deploy.
+- **Follow the upload guide**
+  - Open `upload.html` locally or on GitHub Pages for a checklist covering deck additions, edits, removals, and inventory updates.
+  - Keep the guide in sync with any new workflows so contributors have a single source of truth.
+
+After intentional HTML changes, refresh the snapshot hashes so pytest accepts the new baseline (see “Updating the HTML snapshot hashes” below).
 
 Everything uses a black background, white text, and monospace fonts to stay readable as plain text. You can preview locally with
 `python -m http.server` from the repo root and opening `http://localhost:8000/index.html` in a browser.
@@ -78,6 +96,18 @@ pytest
 ```
 
 Tests use temporary deck directories and fake resolvers so they do not touch real files or Scryfall. The suite finishes in well under a second on a typical laptop, so it is safe to run before every change.
+
+Each pytest run overwrites `pytest-results.md` in the repository root with a short Markdown summary (counts, duration, exit status). Commit it alongside code changes so readers can see the latest test outcome. If CI is running tests from an installed package path or a read-only workspace, point the report somewhere writable via `PYTEST_RESULTS_PATH=/tmp/pytest-results.md`; the hook will fall back to writing in the current working directory if the configured location is unavailable.
+
+### Updating the HTML snapshot hashes
+`tests/test_html_baseline.py` locks down the public HTML files (e.g., `index.html`) by comparing their SHA256 hashes to the last known-good version. When you intentionally change an HTML file, refresh the snapshot mapping so pytest reflects the new baseline:
+
+```bash
+python scripts/refresh_html_hashes.py       # print the new mapping
+python scripts/refresh_html_hashes.py --write  # rewrite tests/test_html_baseline.py
+```
+
+Run the script only after you are confident the HTML change is intentional and ready to become the new baseline.
 
 ## Deck file layout
 Decks use YAML-style front matter followed by Markdown content. A minimal example:

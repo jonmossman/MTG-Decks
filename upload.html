@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Update MTG Decks & Inventory</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #060608;
+      --panel: #0f1116;
+      --border: #1c1f27;
+      --accent: #71c9f8;
+      --accent-strong: #9ae7ff;
+      --text: #f1f5ff;
+      --muted: #a4b3cc;
+      --shadow: 0 16px 40px rgba(0, 0, 0, 0.4);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: radial-gradient(circle at 12% 20%, rgba(113, 201, 248, 0.08), transparent 25%),
+        radial-gradient(circle at 88% 8%, rgba(154, 231, 255, 0.08), transparent 22%),
+        var(--bg);
+      color: var(--text);
+      font-family: "Inter", "SF Pro Text", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      line-height: 1.6;
+      padding: 28px 16px 48px;
+    }
+
+    a {
+      color: var(--accent);
+    }
+
+    a:hover,
+    a:focus-visible {
+      color: var(--accent-strong);
+    }
+
+    .page {
+      max-width: 1100px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+    }
+
+    header {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      padding: 18px;
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      box-shadow: var(--shadow);
+    }
+
+    .topbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .brand {
+      font-weight: 700;
+      letter-spacing: 0.5px;
+    }
+
+    .nav {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      padding: 8px 14px;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      background: rgba(255, 255, 255, 0.02);
+      color: var(--text);
+      text-decoration: none;
+      font-weight: 600;
+      cursor: pointer;
+      transition: border 160ms ease, color 160ms ease, background 160ms ease;
+    }
+
+    .button.primary {
+      background: linear-gradient(90deg, #61dafb, #9ae7ff);
+      color: #051018;
+      border: 1px solid #9ae7ff;
+      box-shadow: var(--shadow);
+    }
+
+    .button:hover,
+    .button:focus-visible {
+      border-color: var(--accent);
+      color: var(--accent-strong);
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 16px;
+    }
+
+    .card {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 16px;
+      box-shadow: var(--shadow);
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .card h2 {
+      margin: 0;
+      font-size: 1.1rem;
+    }
+
+    .pill-row {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 10px;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      background: rgba(255, 255, 255, 0.04);
+      color: var(--muted);
+      font-size: 0.9rem;
+    }
+
+    .list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      padding-left: 16px;
+    }
+
+    .list li {
+      color: var(--muted);
+    }
+
+    .section-title {
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      font-size: 0.8rem;
+      color: var(--muted);
+      margin: 8px 0 0;
+    }
+
+    .panel {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 16px;
+      box-shadow: var(--shadow);
+    }
+
+    .panel h3 {
+      margin-top: 0;
+    }
+
+    .steps {
+      counter-reset: step;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      padding-left: 16px;
+    }
+
+    .steps li {
+      counter-increment: step;
+      list-style: none;
+      position: relative;
+      padding-left: 26px;
+      color: var(--muted);
+    }
+
+    .steps li::before {
+      content: counter(step);
+      position: absolute;
+      left: 0;
+      top: 4px;
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      background: rgba(113, 201, 248, 0.15);
+      color: var(--accent-strong);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.85rem;
+      border: 1px solid var(--border);
+    }
+
+    .footer {
+      text-align: center;
+      color: var(--muted);
+      font-size: 0.9rem;
+      padding: 16px;
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <header>
+      <div class="topbar">
+        <div class="brand">MTG Decks &amp; Inventory</div>
+        <nav class="nav">
+          <a class="button" href="index.html">Home</a>
+          <a class="button" href="decks.html">Deck Browser</a>
+          <a class="button" href="inventory.html">Inventory</a>
+          <a class="button primary" href="#">Upload Guide</a>
+        </nav>
+      </div>
+      <div>
+        <h1 style="margin: 0">Update GitHub Pages content</h1>
+        <p style="color: var(--muted); margin: 6px 0 0; max-width: 780px;">
+          Keep the deck browser and inventory table in sync with the Markdown source. Follow these checklists when adding,
+          amending, or removing content so GitHub Pages always reflects the latest lists.
+        </p>
+      </div>
+      <div class="pill-row">
+        <span class="pill">Markdown-first</span>
+        <span class="pill">No build step</span>
+        <span class="pill">Dark mode ready</span>
+      </div>
+    </header>
+
+    <section class="section-title">Decks</section>
+    <div class="grid">
+      <article class="card">
+        <h2>Add a new deck</h2>
+        <ul class="steps">
+          <li>Create or import a Markdown file in <code>decks/</code> (e.g.,
+            <code>mtg-decks create "New Deck" "Commander" --colors W U</code>).</li>
+          <li>Open <code>decks.html</code> and append a deck entry to the <code>decks</code> array with
+            <code>id</code>, <code>title</code>, <code>commander</code>, and the Markdown filename.</li>
+          <li>Commit the new <code>decks/&lt;deck&gt;.md</code> file and the updated <code>decks.html</code>, then push so
+            GitHub Pages can serve it immediately.</li>
+        </ul>
+        <div class="pill-row">
+          <span class="pill">Deck lives in Markdown</span>
+          <span class="pill">Listed in decks array</span>
+        </div>
+      </article>
+
+      <article class="card">
+        <h2>Amend an existing deck</h2>
+        <ul class="steps">
+          <li>Edit the corresponding Markdown in <code>decks/</code> and save.</li>
+          <li>If you renamed the file, update its <code>file</code> path and <code>title</code> in the
+            <code>decks</code> array inside <code>decks.html</code>.</li>
+          <li>Re-run valuation or spec checks if needed, commit the changes, and push.</li>
+        </ul>
+        <div class="pill-row">
+          <span class="pill">Edit markdown directly</span>
+          <span class="pill">Update paths if renamed</span>
+        </div>
+      </article>
+
+      <article class="card">
+        <h2>Remove a deck</h2>
+        <ul class="steps">
+          <li>Delete the Markdown file from <code>decks/</code>.</li>
+          <li>Remove its entry from the <code>decks</code> array in <code>decks.html</code> so the browser list stays
+            clean.</li>
+          <li>Commit both removals and push to update GitHub Pages.</li>
+        </ul>
+        <div class="pill-row">
+          <span class="pill">Clean browser list</span>
+          <span class="pill">Remove stale files</span>
+        </div>
+      </article>
+    </div>
+
+    <section class="section-title">Inventory</section>
+    <div class="grid">
+      <article class="card">
+        <h2>Add or update cards</h2>
+        <ul class="steps">
+          <li>Use <code>mtg-decks spares import --box "Box Name"</code> with a CSV or pasted list to merge counts into
+            <code>inventory.md</code>. Sorting flags rewrite the table for you.</li>
+          <li>Commit the refreshed <code>inventory.md</code> so the inventory table reflects the latest counts.</li>
+          <li>Open <code>inventory.html</code> locally or on Pages to verify the table renders as expected.</li>
+        </ul>
+        <div class="pill-row">
+          <span class="pill">CLI rewrites table</span>
+          <span class="pill">Box + type filters</span>
+        </div>
+      </article>
+
+      <article class="card">
+        <h2>Remove cards</h2>
+        <ul class="steps">
+          <li>Run another <code>mtg-decks spares import</code> with updated counts (or a CSV/text file that omits removed
+            cards) to regenerate <code>inventory.md</code>.</li>
+          <li>Alternatively, open <code>inventory.md</code> and delete the rows you no longer need, then save.</li>
+          <li>Commit the updated <code>inventory.md</code> and push to refresh GitHub Pages.</li>
+        </ul>
+        <div class="pill-row">
+          <span class="pill">Regenerate table</span>
+          <span class="pill">Manual edits allowed</span>
+        </div>
+      </article>
+    </div>
+
+    <div class="panel">
+      <h3>Ship it</h3>
+      <p style="color: var(--muted); margin: 0;">
+        After any deck or inventory change, run <code>pytest -q</code> locally if you have the tooling installed, then commit and
+        push. GitHub Pages will serve the updated Markdown files immediately.
+      </p>
+    </div>
+
+    <div class="footer">Need the CLI? Run <code>pip install -e .</code> from the repo root to install the local tools.</div>
+  </div>
+</body>
+</html>
