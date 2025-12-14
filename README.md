@@ -152,6 +152,13 @@ print("Missing prices:", valuation.missing_prices)
 - **Change control**: Treat `decks/` like source code—review diffs of generated Markdown, keep validation logs in CI artifacts, and run `pytest` on pull requests to catch rule violations before merging.
 - **Data provenance**: When fuzzy matching card names, keep the original CSV/text around for auditability and note any resolver warnings in commit messages or deck notes so you remember which entries were guesses.
 
+## Handling merge conflicts
+If you pull or merge and see `CONFLICT` messages, it usually means the same deck Markdown or README section changed on both branches.
+
+- Run `git status` to see the conflicted files, then `git diff --merge <file>` to view conflict markers.
+- Keep the up-to-date command/validation docs from `README.md` and re-run `PYTHONPATH=src pytest` after fixing conflicts.
+- For deck files, ensure the final file still has 100 cards, required commander tags, and valid front matter before committing.
+
 ## Developing and testing
 - Run the test suite: `PYTHONPATH=src pytest`
 - If you are stubbing network calls, pass a custom resolver to importer/valuer helpers in your tests.
