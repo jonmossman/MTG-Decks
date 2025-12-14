@@ -105,6 +105,23 @@ mtg-decks import "Uploaded Deck" "The Ur-Dragon" --file cards.csv --overwrite
 # or
 mtg-decks import "Uploaded Deck" "The Ur-Dragon" --cards $'2 sol rng\n1 arcane signet' --theme "Big dragons"
 ```
+How the importer works under the hood:
+- Parses newline or CSV rows into `(count, name)` pairs and tolerates suffixes such as `2x`/`3X` when they lead the entry.
+- Uses Scryfall's fuzzy matcher to normalize commander and card names; falls back to your text when a lookup fails.
+- Uses the commander's color identity unless `--colors` is provided.
+- Removes explicit commander entries from the decklist so you do not end up with duplicates in the Markdown output.
+- Writes a Markdown file in your decks directory using the deck slug (`<deck-name>.md`).
+- Optionally enforces `CommanderRules` if you pass `--rules` in Python, deleting the generated file again when validation fails.
+
+Usage tips for adding decks:
+- CSVs must be `count,name` and text can be free-form lines like `2 Sol Ring` or `1x Arcane Signet`.
+- Pass `--overwrite` if you are re-importing a deck to update an existing file.
+- To import from another site such as Moxfield, export the decklist as text or CSV and feed it directly:
+  ```bash
+  mtg-decks import "<Deck Name>" "<Commander>" --file exported.csv --theme "Copied from Moxfield" --overwrite
+  # or, when you copied the decklist into your clipboard, paste it into --cards
+  mtg-decks import "<Deck Name>" "<Commander>" --cards "$'<pasted deck text>'"
+  ```
 Behavior and tips:
 - Accepts CSV rows (`quantity,name`) or newline-separated text (`2 Sol Ring`).
 - Handles common count suffixes like `2x Sol Ring` or `2X Sol Ring` in addition to bare numbers.
