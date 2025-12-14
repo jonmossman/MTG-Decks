@@ -35,19 +35,12 @@ HTML lives at the repository root:
 - `decks.html`: lists deck files and fetches their raw markdown.
 - `inventory.html`: loads `inventory.md` and adds search/sort/filter controls over the table.
 
-CI automatically publishes these assets to GitHub Pages on every push to `main` (e.g., after a merge). The workflow:
-
-- Installs the package and runs `pytest`, recording both console output and a JUnit XML file as a downloadable artifact.
-- Copies the dark-themed HTML along with markdown assets (`README.md`, `inventory.md`, `FUNCTIONAL_SPEC.md`, `valuation-report.md`) and deck files into a `public/` folder for publishing.
-- Deploys the `public/` artifact to GitHub Pages once tests pass.
-
 To publish on GitHub Pages:
 
-1. Push the repository to GitHub and open **Settings → Pages → Build and deployment**. Choose **Source: GitHub Actions** so the `pages.yml` workflow can deploy for you.
-2. Merge to `main` or run the workflow manually; it will test, package, and deploy to Pages automatically.
-3. Keep the provided `.nojekyll` file so raw `.md` assets are served to the browser.
-4. Update the hard-coded deck list in `decks.html` to match your files by adjusting the `file` paths (e.g., `decks/<slug>.md`).
-5. Commit `inventory.md` so `inventory.html` can parse the table and populate the filters.
+1. Push the repository to GitHub and enable Pages for the main branch.
+2. Keep the provided `.nojekyll` file so raw `.md` assets are served to the browser.
+3. Update the hard-coded deck list in `decks.html` to match your files by adjusting the `file` paths (e.g., `decks/<slug>.md`).
+4. Commit `inventory.md` so `inventory.html` can parse the table and populate the filters.
 
 Everything uses a black background, white text, and monospace fonts to stay readable as plain text. You can preview locally with
 `python -m http.server` from the repo root and opening `http://localhost:8000/index.html` in a browser.
