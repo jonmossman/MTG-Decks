@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MTG Decks & Inventory</title>
+  <style>
+    :root {
+      color-scheme: dark;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      padding: 24px;
+      background: #000;
+      color: #fff;
+      font-family: "Fira Code", "SFMono-Regular", Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      line-height: 1.6;
+    }
+
+    a {
+      color: #9cf;
+    }
+
+    a:hover,
+    a:focus-visible {
+      color: #cde3ff;
+    }
+
+    h1,
+    h2,
+    h3 {
+      margin: 0 0 0.5em;
+      font-weight: 700;
+    }
+
+    p {
+      margin: 0 0 0.75em;
+    }
+
+    .section {
+      border: 1px solid #222;
+      padding: 16px;
+      margin-bottom: 16px;
+      background: #0a0a0a;
+    }
+
+    .nav {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .nav a {
+      text-decoration: none;
+      border: 1px solid #333;
+      padding: 8px 12px;
+      background: #111;
+      color: #fff;
+    }
+
+    .nav a:hover,
+    .nav a:focus-visible {
+      border-color: #555;
+      background: #181818;
+    }
+  </style>
+</head>
+<body>
+  <header class="section">
+    <h1>MTG Decks &amp; Inventory</h1>
+    <p>A plain-text friendly homepage for browsing decks, spare-card inventory, and project config on GitHub Pages.</p>
+    <nav class="nav">
+      <a href="decks.html">Deck Browser</a>
+      <a href="inventory.html">Inventory</a>
+      <a href="README.md">README</a>
+      <a href="FUNCTIONAL_SPEC.md">Functional Spec</a>
+      <a href="valuation-report.md">Valuation Report</a>
+    </nav>
+  </header>
+
+  <main>
+    <section class="section">
+      <h2>Decks</h2>
+      <p>Open the Deck Browser to read decklists in their original markdown. Each deck is loaded from the repository so you can keep editing the files you already maintain.</p>
+    </section>
+
+    <section class="section">
+      <h2>Inventory</h2>
+      <p>The Inventory page parses the <code>inventory.md</code> table and lets you search, sort, and filter cards while keeping the black background and white text aesthetic.</p>
+    </section>
+
+    <section class="section">
+      <h2>Configuration &amp; Notes</h2>
+      <p>Quick links to documentation and reports live alongside the decks and inventory so everything is reachable from one index page.</p>
+    </section>
+  </main>
+</body>
+</html>
