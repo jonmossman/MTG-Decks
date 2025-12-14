@@ -65,6 +65,12 @@
       letter-spacing: 0.3px;
     }
 
+    .nav {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
     .button {
       display: inline-flex;
       align-items: center;
@@ -179,10 +185,11 @@
   <div class="page">
     <div class="topbar">
       <div class="brand">Deck Browser</div>
-      <div class="nav">
+      <nav class="nav">
         <a class="button" href="index.html">Home</a>
         <a class="button" href="inventory.html">Inventory</a>
-      </div>
+        <a class="button" href="functional-spec.html">Spec</a>
+      </nav>
     </div>
 
     <div class="panel">

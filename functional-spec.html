@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MTG Decks – Functional Spec</title>
+  <style>
+
+    :root {
+      color-scheme: dark;
+      --bg: #04060a;
+      --panel: #0d1017;
+      --border: #1c1f27;
+      --accent: #71c9f8;
+      --accent-strong: #9ae7ff;
+      --text: #f1f5ff;
+      --muted: #a4b3cc;
+      --shadow: 0 14px 36px rgba(0, 0, 0, 0.38);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: radial-gradient(circle at 12% 14%, rgba(113, 201, 248, 0.12), transparent 25%),
+        radial-gradient(circle at 82% -6%, rgba(154, 231, 255, 0.12), transparent 22%),
+        var(--bg);
+      color: var(--text);
+      font-family: "Inter", "SF Pro Text", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      line-height: 1.65;
+      padding: 32px 16px 48px;
+    }
+
+    a {
+      color: var(--accent);
+      text-decoration: none;
+    }
+
+    a:hover,
+    a:focus-visible {
+      color: var(--accent-strong);
+    }
+
+    .page {
+      max-width: 1100px;
+      margin: 0 auto;
+      display: grid;
+      gap: 18px;
+    }
+
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+      background: rgba(255, 255, 255, 0.02);
+      border: 1px solid var(--border);
+      padding: 12px 16px;
+      border-radius: 12px;
+    }
+
+    .brand {
+      font-weight: 700;
+      letter-spacing: 0.3px;
+    }
+
+    .nav {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .button {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 9px 12px;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      background: rgba(255, 255, 255, 0.02);
+      color: var(--text);
+      text-decoration: none;
+      font-weight: 600;
+      transition: transform 120ms ease, border-color 120ms ease, background 120ms ease;
+    }
+
+    .button:hover,
+    .button:focus-visible {
+      transform: translateY(-1px);
+      border-color: #2a2f3b;
+      background: rgba(113, 201, 248, 0.08);
+    }
+
+    header.hero {
+      background: linear-gradient(135deg, rgba(113, 201, 248, 0.14), rgba(6, 8, 12, 0.7)), var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 24px;
+      box-shadow: var(--shadow);
+      display: grid;
+      gap: 12px;
+    }
+
+    .hero h1 {
+      margin: 0;
+      font-size: clamp(1.9rem, 2.9vw + 1rem, 2.7rem);
+    }
+
+    .hero p {
+      margin: 0;
+      color: var(--muted);
+      max-width: 820px;
+    }
+
+    .pill-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .pill {
+      border: 1px solid var(--border);
+      background: rgba(255, 255, 255, 0.02);
+      padding: 7px 10px;
+      border-radius: 999px;
+      color: var(--muted);
+      font-weight: 600;
+      font-size: 0.95rem;
+    }
+
+    .card {
+      background: rgba(255, 255, 255, 0.02);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 18px;
+      box-shadow: var(--shadow);
+      display: grid;
+      gap: 14px;
+    }
+
+    .columns {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 18px;
+    }
+
+    .toc h2 {
+      margin: 0 0 6px 0;
+    }
+
+    .toc ul {
+      list-style: none;
+      padding-left: 0;
+      margin: 0;
+      display: grid;
+      gap: 6px;
+    }
+
+    .toc li {
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 8px 10px;
+      background: rgba(255, 255, 255, 0.02);
+    }
+
+    .spec-content h2,
+    .spec-content h3 {
+      margin-top: 18px;
+      margin-bottom: 10px;
+    }
+
+    .spec-content table {
+      width: 100%;
+      border-collapse: collapse;
+      background: rgba(255, 255, 255, 0.02);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      overflow: hidden;
+    }
+
+    .spec-content th,
+    .spec-content td {
+      padding: 10px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .spec-content tr:last-child td {
+      border-bottom: none;
+    }
+
+    @media (max-width: 900px) {
+      .columns {
+        grid-template-columns: 1fr;
+      }
+    }
+
+  </style>
+</head>
+<body>
+  <div class="page">
+    <div class="topbar">
+      <div class="brand">MTG Decks</div>
+      <div class="nav">
+        <a class="button" href="index.html">Home</a>
+        <a class="button" href="decks.html">Deck Browser</a>
+        <a class="button" href="inventory.html">Inventory</a>
+        <a class="button" href="valuation-report.md">Valuation report</a>
+      </div>
+    </div>
+
+    <header class="hero">
+      <h1>Functional Specification</h1>
+      <p>A single source of truth for MTG-Decks requirements, CLI behavior, and data contracts. This HTML is generated from FUNCTIONAL_SPEC.md to keep both formats aligned.</p>
+      <div class="pill-row">
+        <div class="pill">Markdown + HTML parity</div>
+        <div class="pill">Deck + inventory coverage</div>
+        <div class="pill">CI-verified</div>
+      </div>
+    </header>
+
+    <div class="columns">
+      <aside class="card toc">
+        <h2>Contents</h2>
+        <ul><li><a href="#mtg-decks-functional-specification">MTG-Decks Functional Specification</a></li><li><a href="#purpose">Purpose</a></li><li><a href="#scope-and-goals">Scope and goals</a></li><li><a href="#out-of-scope">Out of scope</a></li><li><a href="#users-and-primary-use-cases">Users and primary use cases</a></li><li><a href="#data-model">Data model</a></li><li><a href="#functional-requirements">Functional requirements</a></li><li><a href="#deck-library">Deck library</a></li><li><a href="#deck-creation">Deck creation</a></li><li><a href="#deck-import">Deck import</a></li><li><a href="#deck-validation">Deck validation</a></li><li><a href="#valuation">Valuation</a></li><li><a href="#spares-inventory">Spares inventory</a></li><li><a href="#templates-and-customization">Templates and customization</a></li><li><a href="#cli-surface">CLI surface</a></li><li><a href="#configuration-and-environment">Configuration and environment</a></li><li><a href="#error-handling">Error handling</a></li><li><a href="#non-functional-considerations">Non-functional considerations</a></li><li><a href="#acceptance-criteria">Acceptance criteria</a></li></ul>
+      </aside>
+      <main class="card spec-content"><h1 id="mtg-decks-functional-specification">MTG-Decks Functional Specification</h1>
+<h2 id="purpose">Purpose</h2>
+<p>MTG-Decks is a Python library and CLI for authoring, validating, importing, valuing, and searching Magic: The Gathering Commander decks stored as Markdown files. It also manages a catalog of spare cards so a collector can see what is available, where it is stored, and how much it is worth. This specification captures the expected behaviors, user flows, and data contracts that guide development and QA.</p>
+<h2 id="scope-and-goals">Scope and goals</h2>
+<ul>
+  <li>Preserve decks as front-matter Markdown so they can be versioned, linted, and edited in any tool.</li>
+  <li>Offer parity between CLI commands and Python APIs for deck creation, import, validation, valuation, and spare-card inventory management.</li>
+  <li>Minimize external dependencies by relying only on Scryfall for card resolution and price data, with facilities for offline or cached operation.</li>
+  <li>Keep workflows fast (sub-second for tests and typical commands) and deterministic by isolating filesystem effects to the configured deck and inventory paths.</li>
+  <li>Provide predictable flows for organizing physical collections: labeling boxes, merging duplicate entries, and updating counts when cards move between decks and spares.</li>
+</ul>
+<h3 id="out-of-scope">Out of scope</h3>
+<ul>
+  <li>Running in non-Python environments.</li>
+  <li>Managing game-play statistics or analytics beyond deck metadata and card lists.</li>
+  <li>Real-time synchronization with remote stores (Git remotes are manual).</li>
+</ul>
+<h2 id="users-and-primary-use-cases">Users and primary use cases</h2>
+<ul>
+  <li><strong>Deck authors</strong>: Create and edit Commander deck files, import messy lists, and keep prices up to date.</li>
+  <li><strong>Developers</strong>: Script deck operations through the Python API, swap in custom resolvers, and integrate with CI.</li>
+  <li><strong>Organizers/collectors</strong>: Track spare cards and storage boxes, sort by value or CMC, and search inventory quickly.</li>
+</ul>
+<h2 id="data-model">Data model</h2>
+<ul>
+  <li><strong>Deck file</strong>: Markdown with YAML-like front matter: <code>name</code>, <code>commander</code>, optional <code>colors</code>, <code>theme</code>, <code>format</code> (default <code>Commander</code>), <code>created</code>, <code>updated</code>, and free-form <code>notes</code>. The body may include templated content and a <code>## Decklist</code> section with <code>- [Commander] ...</code> and card bullets that accept prefixes like <code>2x</code> or <code>2X</code>. Multiple sections (e.g., <code>## Ramp</code>, <code>## Removal</code>) are allowed; all list items are parsed as card lines unless explicitly marked as comments.</li>
+  <li><strong>Spares inventory</strong>: Markdown table containing count, name, box label, type line, CMC, unit value, and total value, plus a header storing the preferred currency. Rows represent discrete storage locations; two boxes holding the same card create two rows rather than aggregating.</li>
+  <li><strong>Valuation cache</strong>: JSON keyed by deck name and currency with totals, timestamps, and per-card resolved prices to avoid repeat network lookups within the same calendar month. Cache records include a <code>source</code> to identify which resolver produced the data.</li>
+  <li><strong>Reports</strong>: Optional Markdown valuation reports and inventory snapshots saved to disk with a datestamped filename so collection history can be tracked over time.</li>
+</ul>
+<h2 id="functional-requirements">Functional requirements</h2>
+<h3 id="deck-library">Deck library</h3>
+<ul>
+  <li><strong>Deck discovery</strong>: Load and list <code>*.md</code> files from the configured root. Slugs are derived from names (e.g., <code>My Deck</code> → <code>my-deck.md</code>). Hidden files and non-Markdown files are ignored. A missing directory is treated as empty but never created implicitly.</li>
+  <li><strong>Summaries</strong>: <code>list</code> outputs <code>&amp;quot;Name (colors) — theme :: Commander: &amp;lt;name&amp;gt;&amp;quot;</code> entries; ordering matches sorted filenames. Colors default to color identity of the commander when absent.</li>
+  <li><strong>Show</strong>: Print name, commander, colors, theme, format, notes, created, and updated fields when present. Show also surfaces counts of main-deck cards, unique card names, and total deck value if a cache entry exists.</li>
+</ul>
+<h3 id="deck-creation">Deck creation</h3>
+<ul>
+  <li>Inputs: deck name, commander, optional colors/theme/notes/format, and optional body template path.</li>
+  <li>Behavior: Fail if the target slug already exists. If a template path is provided, require it to exist. Write a new Markdown deck with populated front matter and optional templated body; <code>created</code> defaults to today’s ISO date. <code>updated</code> remains unset until the deck is modified by later commands.</li>
+  <li>Metadata validation: Commander and name must be non-empty strings; colors accept the characters <code>WUBRGC</code> and are normalized to uppercase sorted order.</li>
+  <li>Template substitution: Templates can include front-matter placeholders and a <code>{decklist}</code> marker. When no decklist placeholder is present, a <code>## Decklist</code> heading followed by the commander line is appended automatically.</li>
+</ul>
+<h3 id="deck-import">Deck import</h3>
+<ul>
+  <li>Inputs: deck name, commander, and card source as free-form text, inline CSV, or file path; optional colors/theme/notes/format; optional overwrite flag; optional validation rules and resolver.</li>
+  <li>Parsing: Accept header rows like <code>Count,Name</code> or <code>Name,Count</code>; recognize counts with <code>x</code> suffixes; default counts to <code>1</code> when missing. Sideboard or maybeboard markers such as <code>SB:</code> or <code>Maybe:</code> are ignored rather than written.</li>
+  <li>Resolution: Use Scryfall fuzzy matching by default. Normalize commander and card names; warn when lookups fail or names change. Infer colors from commander color identity when not supplied. Double-faced and split cards are stored under their front face name while retaining the card’s color identity and CMC from the resolver.</li>
+  <li>Output: Write a Markdown deck containing the commander plus normalized cards (excluding commander duplicates). Decklist entries are sorted alphabetically by name, with counts preserved. If rules are supplied and violations occur, delete the written file and raise a validation error.</li>
+  <li>Overwrite protection: Reject writes when a deck already exists unless <code>overwrite=True</code>.</li>
+  <li>Post-processing: Set <code>updated</code> to today’s date after successful import. Optionally emit a valuation report immediately when <code>--value-after</code> is supplied.</li>
+</ul>
+<h3 id="deck-validation">Deck validation</h3>
+<ul>
+  <li>Inputs: optional Commander ruleset (deck size, singleton enforcement, commander tagging, banned cards, partner/background allowances, etc.) and optional log path.</li>
+  <li>Behavior: Parse each decklist, validate per rules, and collect errors. Write a fresh log file on every run when <code>log_path</code> is provided. Return a list of issues; include parsing failures and missing required metadata.</li>
+  <li>Supported rules: enforce 100-card size (or custom target), allow up to two commanders when partner/background rules permit, flag duplicates outside the commander zone, and block banned-card names (case-insensitive). Logs include file path, line numbers, and suggested fixes.</li>
+  <li>Exit conditions: Validation returns a non-zero exit code when any error is present so CI can fail fast.</li>
+</ul>
+<h3 id="valuation">Valuation</h3>
+<ul>
+  <li>Inputs: deck name or slug (or all decks), currency (defaults to <code>gbp</code>), optional resolver, optional cache, optional clock override.</li>
+  <li>Behavior: Parse decklists, resolve prices, and total values while reporting cards with missing prices. Cache lookups per deck/currency/month when provided. <code>value-all</code> returns a mapping of deck names to valuations and updates the cache once at the end.</li>
+  <li>Pricing rules: Use market prices by default; fallback to <code>0</code> for missing prices while emitting warnings. Totals reflect <code>count * unit_price</code> per card and sum across main deck only (commander included).</li>
+  <li>Reports: CLI supports generating Markdown valuation reports that can be committed over time. Reports include per-card line items sorted by descending unit price, deck subtotal, missing-price list, timestamp, and resolver identity. Re-running on the same day replaces the previous report for that day.</li>
+  <li>Cache invalidation: Cache entries expire after a calendar month rollover or when invoked with <code>--refresh-cache</code>, forcing fresh lookups.</li>
+</ul>
+<h3 id="spares-inventory">Spares inventory</h3>
+<ul>
+  <li><strong>Import</strong>: Accept card text or CSV with an associated <code>--box</code> label; normalize counts and names through the resolver; price entries; merge with existing inventory; and rewrite the Markdown table sorted by name, value, or CMC. Missing prices are flagged but do not halt processing. When merging, rows with identical normalized names and box labels are collapsed by summing counts and recomputing total value.</li>
+  <li><strong>Transfer between boxes</strong>: Support a <code>--move</code> mode that decrements counts from one box and increments another, deleting rows whose counts reach zero so the inventory always reflects physical storage.</li>
+  <li><strong>De-duping with decks</strong>: An optional <code>--sync-decks</code> flag can subtract deck contents from the spare pool to show only true extras, using the same resolver normalization to avoid mismatches.</li>
+  <li><strong>Search</strong>: Filter inventory by query text and/or box label and order results by name, value, or CMC. Output includes counts, boxes, type lines, and pricing details. Query text matches against name and type line with case-insensitive substring logic. Empty results return a friendly &quot;no matches&quot; message rather than failing.</li>
+  <li><strong>Snapshots and audit</strong>: <code>spares export</code> writes the current table to CSV for spreadsheets. <code>spares report</code> generates a Markdown summary with totals per box, top 10 most valuable cards, and collection grand total. Both commands respect the current resolver and currency settings.</li>
+</ul>
+<h3 id="templates-and-customization">Templates and customization</h3>
+<ul>
+  <li>Body templates for <code>create</code> and <code>import</code> accept placeholders <code>{name}</code>, <code>{commander}</code>, <code>{colors}</code>, <code>{format}</code>, <code>{created}</code>, and <code>{notes}</code>. Templates may live alongside decks or in any specified path.</li>
+  <li>Custom resolvers can replace Scryfall for offline or cached operation; callers supply them to importer or valuer helpers.</li>
+</ul>
+<h3 id="cli-surface">CLI surface</h3>
+<table>
+  <thead><tr><th>Command</th><th>Purpose</th><th>Key options</th></tr></thead>
+  <tbody>
+    <tr><td><code>mtg-decks list</code></td><td>Print one-line summaries for each deck in the target directory.</td><td><code>--dir</code> to target another folder.</td></tr>
+    <tr><td><code>mtg-decks show &amp;lt;name-or-slug&amp;gt;</code></td><td>Display metadata for a single deck.</td><td><code>--dir</code></td></tr>
+    <tr><td><code>mtg-decks create &amp;lt;name&amp;gt; &amp;lt;commander&amp;gt;</code></td><td>Create a new deck file.</td><td><code>--colors</code>, <code>--theme</code>, <code>--notes</code>, <code>--format</code>, <code>--template</code>, <code>--dir</code></td></tr>
+    <tr><td><code>mtg-decks import &amp;lt;name&amp;gt; &amp;lt;commander&amp;gt;</code></td><td>Import a deck from text or CSV.</td><td><code>--cards</code> or <code>--file</code>, <code>--colors</code>, <code>--theme</code>, <code>--notes</code>, <code>--format</code>, <code>--overwrite</code>, <code>--dir</code>, <code>--value-after</code></td></tr>
+    <tr><td><code>mtg-decks validate</code></td><td>Validate all decks in the directory.</td><td><code>--log</code>, <code>--deck-size</code>, <code>--ban</code>, partner/background toggles, <code>--dir</code></td></tr>
+    <tr><td><code>mtg-decks value &amp;lt;name-or-slug&amp;gt;</code></td><td>Price a single deck.</td><td><code>--currency</code>, resolver flags, <code>--dir</code>, cache path env var, <code>--refresh-cache</code></td></tr>
+    <tr><td><code>mtg-decks value-all</code></td><td>Price every deck and optionally emit a report.</td><td><code>--currency</code>, <code>--report</code>, resolver flags, <code>--dir</code>, <code>--refresh-cache</code></td></tr>
+    <tr><td><code>mtg-decks spares import</code></td><td>Add spare cards to the inventory and price them.</td><td><code>--box</code>, <code>--cards</code> or <code>--file</code>, <code>--sort</code>, <code>--spares-file</code>, <code>--currency</code></td></tr>
+    <tr><td><code>mtg-decks spares move</code></td><td>Move spares between boxes.</td><td><code>--from</code>, <code>--to</code>, <code>--cards</code> or <code>--file</code>, <code>--spares-file</code>, <code>--currency</code></td></tr>
+    <tr><td><code>mtg-decks spares search</code></td><td>Query spare cards by text/box with sorting.</td><td><code>--query</code>, <code>--box</code>, <code>--sort</code>, <code>--spares-file</code>, <code>--currency</code></td></tr>
+    <tr><td><code>mtg-decks spares export</code></td><td>Save the spare inventory as CSV.</td><td><code>--spares-file</code>, <code>--out</code></td></tr>
+    <tr><td><code>mtg-decks spares report</code></td><td>Summarize spare inventory totals.</td><td><code>--spares-file</code>, <code>--currency</code></td></tr>
+    <tr><td><code>mtg-decks --version</code></td><td>Show the installed CLI version.</td><td>n/a</td></tr>
+  </tbody>
+</table>
+<h3 id="configuration-and-environment">Configuration and environment</h3>
+<ul>
+  <li>Deck root defaults to <code>./decks</code>; override with <code>--dir</code> or by passing a custom path to <code>DeckLibrary</code>.</li>
+  <li>Valuation defaults can be set via environment variables: <code>MTG_DECKS_CURRENCY</code>, <code>MTG_DECKS_VALUATION_SOURCE</code>, and <code>MTG_DECKS_VALUATION_CACHE</code> (can be set in <code>.env</code>).</li>
+  <li>Resolver base URLs and cache paths are pluggable to support offline or rate-limited contexts.</li>
+  <li>Spare inventory path defaults to <code>./inventory.md</code> but can be overridden per command. Box labels are free-form strings and are case-sensitive.</li>
+  <li>Commands read <code>.env</code> when present; environment variables always win over front matter or CLI defaults.</li>
+</ul>
+<h3 id="error-handling">Error handling</h3>
+<ul>
+  <li>File-system conflicts (existing deck, missing template) raise explicit exceptions and do not overwrite existing data.</li>
+  <li>Failed imports with rule violations remove the partially written deck before surfacing the error.</li>
+  <li>Network failures during resolution fall back to user-provided names and record warnings rather than aborting operations unless no cards are supplied.</li>
+  <li>Spares operations never reduce counts below zero; attempts to move or subtract more cards than available surface a descriptive error and leave the inventory unchanged.</li>
+  <li>Pricing warnings (missing price, stale cache, or resolver errors) are accumulated and printed after command output so users do not miss them.</li>
+</ul>
+<h2 id="non-functional-considerations">Non-functional considerations</h2>
+<ul>
+  <li><strong>Performance</strong>: Command execution should complete quickly for typical deck sizes; valuation caches minimize repeat network calls. Spares import of 1,000 cards should complete in under 3 seconds on modern hardware.</li>
+  <li><strong>Determinism</strong>: Validation logs and generated files are rewritten in full on each run to keep diffs meaningful. Inventory tables are rewritten with stable column order and spacing.</li>
+  <li><strong>Testability</strong>: The pytest suite uses temporary directories and fake resolvers; it must run without network access and finish in under a second.</li>
+  <li><strong>Portability</strong>: Uses a pure-Python <code>src/</code> layout with editable installs (<code>pip install -e .</code>) and no platform-specific dependencies.</li>
+  <li><strong>Auditability</strong>: Reports and logs include timestamps and resolver names so historical valuations can be reconstructed and trusted.</li>
+</ul>
+<h2 id="acceptance-criteria">Acceptance criteria</h2>
+<ul>
+  <li>All CLI commands and Python APIs described above are available and behave as specified.</li>
+  <li>Deck creation, import, validation, valuation, and spares workflows succeed end-to-end using only local files and optional network access for Scryfall.</li>
+  <li>Inventory commands can import, move, and report on cards across at least three boxes while keeping counts accurate and prices up to date.</li>
+  <li>Tests pass via <code>pytest</code> after installing dev dependencies with <code>pip install -e .[dev]</code>.</li>
+  <li>Documentation (README and this spec) remains consistent with implemented behavior.</li>
+</ul></main>
+    </div>
+  </div>
+</body>
+</html>
