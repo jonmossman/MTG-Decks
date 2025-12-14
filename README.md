@@ -14,7 +14,9 @@ front-matter driven `.md` files so you can version them, lint them, and keep the
 ```bash
 pip install -e .
 ```
-By default the CLI looks for decks in `./decks`. Point to another directory with `--dir /path/to/decks` on any command.
+The project uses a `src/` layout and is configured for editable installs, so `pip install -e .` will expose the `mtg-decks`
+CLI without extra flags. By default the CLI looks for decks in `./decks`. Point to another directory with `--dir /path/to/decks`
+on any command.
 
 ## Quick start (CLI)
 ```bash
@@ -176,7 +178,8 @@ Use `--source` (or `MTG_DECKS_VALUATION_SOURCE`) to pick the price provider; `sc
 - `MTG_DECKS_VALUATION_SOURCE`: preferred price source (defaults to `scryfall`).
 - `MTG_DECKS_VALUATION_CACHE`: path to the valuation cache file (defaults to `valuation-cache.json`).
 
-You can set these as environment variables or create a simple `.env` file next to the CLI entrypoint:
+You can set these as environment variables or create a simple `.env` file next to the CLI entrypoint (copy `.env.example` to
+get started):
 
 ```
 # .env
@@ -192,6 +195,7 @@ MTG_DECKS_VALUATION_CACHE=.data/valuation-cache.json
 - **Offline workflows**: The importer and valuer accept custom resolvers; plug in a local cache or fixture data when traveling or running CI without internet access so commands keep working.
 - **Change control**: Treat `decks/` like source code—review diffs of generated Markdown, keep validation logs in CI artifacts, and run `pytest` on pull requests to catch rule violations before merging.
 - **Data provenance**: When fuzzy matching card names, keep the original CSV/text around for auditability and note any resolver warnings in commit messages or deck notes so you remember which entries were guesses.
+- **Merge permissions**: List both of your GitHub handles (for this repo: `@jonmossman` and `@jmossman`) in `.github/CODEOWNERS` and enable branch protection that requires code-owner review so only you can approve merges no matter which handle authored the commit.
 
 ## Handling merge conflicts
 If you pull or merge and see `CONFLICT` messages, it usually means the same deck Markdown or README section changed on both branches.
