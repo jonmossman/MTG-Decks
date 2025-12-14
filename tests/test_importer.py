@@ -27,6 +27,17 @@ def test_parse_import_rows_handles_csv_and_lines():
     ]
 
 
+def test_parse_import_rows_skips_headers_and_supports_name_count():
+    rows = importer.parse_import_rows(
+        "Count,Name\nSol Ring,2\nArcane Signet,4x\nName,Qty\nMystic Remora,1"
+    )
+    assert rows == [
+        (2, "Sol Ring"),
+        (4, "Arcane Signet"),
+        (1, "Mystic Remora"),
+    ]
+
+
 def test_import_deck_normalizes_names_and_infers_colors(tmp_path: Path):
     deck_dir = tmp_path / "decks"
     deck_dir.mkdir()

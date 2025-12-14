@@ -8,6 +8,7 @@ from pathlib import Path
 from . import __version__
 from .importer import ScryfallResolver
 from .config import load_config
+from .inventory import SparesInventory, build_spare_cards
 from .library import DeckLibrary
 from .rules import CommanderRules
 from .valuation import ValuationCache, render_valuation_report
@@ -214,6 +215,84 @@ def build_parser() -> argparse.ArgumentParser:
     )
     validate_parser.set_defaults(func=cmd_validate)
 
+    spares_parent = argparse.ArgumentParser(add_help=False)
+    spares_parent.add_argument(
+        "--spares-file",
+        dest="spares_path",
+        type=Path,
+        default=Path("spares.md"),
+        help="Path to the spare card Markdown inventory (default: spares.md)",
+    )
+    spares_parent.add_argument(
+        "--currency",
+        default=_APP_CONFIG.default_currency,
+        help=(
+            "Three-letter currency code to price cards in "
+            f"(default: {_APP_CONFIG.default_currency.upper()})"
+        ),
+    )
+
+    spares_parser = subparsers.add_parser(
+        "spares", help="Import and search spare card inventory", parents=[spares_parent]
+    )
+    spares_sub = spares_parser.add_subparsers(dest="spares_command", required=True)
+
+    spares_import = spares_sub.add_parser(
+        "import",
+        help="Import spare cards from CSV or text into the inventory",
+        parents=[spares_parent],
+    )
+    spares_import.add_argument("--file", type=Path, dest="card_file", help="CSV or text file")
+    spares_import.add_argument(
+        "--cards",
+        dest="card_text",
+        help="Inline card entries separated by newlines (e.g. '2 Sol Ring\\n1 Farseek')",
+    )
+    spares_import.add_argument(
+        "--box",
+        required=True,
+        help="Storage box label so you can find the card later",
+    )
+    spares_import.add_argument(
+        "--sort",
+        choices=["name", "value", "cmc"],
+        default="name",
+        help="Sort order to apply when writing the inventory",
+    )
+    spares_import.add_argument(
+        "--source",
+        default=_APP_CONFIG.valuation_source,
+        help="Price source to use for valuations (default: scryfall)",
+    )
+    spares_import.set_defaults(func=cmd_spares_import)
+
+    spares_search = spares_sub.add_parser(
+        "search", help="Search and sort the spare card inventory", parents=[spares_parent]
+    )
+    spares_search.add_argument(
+        "--query",
+        help="Filter by text appearing in the name, type line, or box label",
+    )
+    spares_search.add_argument(
+        "--box",
+        action="append",
+        dest="boxes",
+        default=[],
+        help="Only show cards from the given box label (repeatable)",
+    )
+    spares_search.add_argument(
+        "--sort",
+        choices=["name", "value", "cmc"],
+        default="name",
+        help="Sort order for the output",
+    )
+    spares_search.add_argument(
+        "--source",
+        default=_APP_CONFIG.valuation_source,
+        help="Price source to use for valuations (default: scryfall)",
+    )
+    spares_search.set_defaults(func=cmd_spares_search)
+
     return parser
 
 
@@ -369,6 +448,88 @@ def cmd_validate(args: argparse.Namespace) -> int:
 
     print("All decks valid.")
     return 0
+
+
+def cmd_spares_import(args: argparse.Namespace) -> int:
+    if not args.card_text and not args.card_file:
+        print("Provide --cards or --file with card entries", file=sys.stderr)
+        return 2
+
+    card_source: str | Path
+    if args.card_text:
+        card_source = args.card_text
+    else:
+        card_source = Path(args.card_file)
+
+    inventory = SparesInventory(args.spares_path)
+    try:
+        spare_cards = build_spare_cards(
+            card_source, resolver=_resolver_from_source(args.source), box=args.box
+        )
+        entries, missing = inventory.add_cards(
+            spare_cards,
+            currency=args.currency,
+            resolver=_resolver_from_source(args.source),
+            sort_by=args.sort,
+        )
+    except Exception as exc:  # pragma: no cover - user facing
+        print(str(exc), file=sys.stderr)
+        return 1
+
+    print(f"Updated inventory at {inventory.path} ({len(entries)} cards tracked)")
+    if missing:
+        print("Missing prices for:")
+        for name in sorted(set(missing)):
+            print(f"- {name}")
+    return 0
+
+
+def cmd_spares_search(args: argparse.Namespace) -> int:
+    inventory = SparesInventory(args.spares_path)
+    try:
+        entries, missing = inventory.search(
+            currency=args.currency,
+            resolver=_resolver_from_source(args.source),
+            query=args.query,
+            boxes=set(args.boxes or []) or None,
+            sort_by=args.sort,
+        )
+    except Exception as exc:  # pragma: no cover - user facing
+        print(str(exc), file=sys.stderr)
+        return 1
+
+    if not entries:
+        print("No spare cards match your filters.")
+        return 0
+
+    header = "| Name | Count | Box | CMC | Type | Unit Value | Total Value |"
+    divider = "| --- | --- | --- | --- | --- | --- | --- |"
+    print(header)
+    print(divider)
+    for entry, unit_price in entries:
+        total = (unit_price or 0.0) * entry.count
+        cmc = "" if entry.cmc is None else entry.cmc
+        type_line = entry.type_line or ""
+        unit_value = _format_price(unit_price, currency=args.currency)
+        total_value = _format_price(total if unit_price is not None else None, currency=args.currency)
+        print(
+            f"| {entry.name} | {entry.count} | {entry.box} | {cmc} | {type_line} | {unit_value} | {total_value} |"
+        )
+
+    if missing:
+        print("\nMissing prices for:")
+        for name in sorted(set(missing)):
+            print(f"- {name}")
+
+    return 0
+
+
+def _format_price(value: float | None, *, currency: str) -> str:
+    if value is None:
+        return "Unknown"
+    symbol = {"usd": "$", "eur": "€", "gbp": "£"}.get(currency.lower())
+    formatted = f"{value:,.2f}"
+    return f"{symbol}{formatted}" if symbol else f"{currency.upper()} {formatted}"
 
 
 def main(argv: list[str] | None = None) -> int:

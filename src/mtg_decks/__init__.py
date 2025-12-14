@@ -2,6 +2,7 @@
 
 from .deck import Deck
 from .importer import CardResolver, ImportResult, ScryfallResolver, import_deck
+from .inventory import SpareCard, SparesInventory, build_spare_cards
 from .library import DeckLibrary
 from .rules import CommanderRules, load_decklist, parse_decklist
 from .valuation import DeckValuation, DeckValuer, ValuationCache
@@ -12,6 +13,9 @@ __all__ = [
     "CommanderRules",
     "Deck",
     "DeckLibrary",
+    "SpareCard",
+    "SparesInventory",
+    "build_spare_cards",
     "ImportResult",
     "CardResolver",
     "ScryfallResolver",
