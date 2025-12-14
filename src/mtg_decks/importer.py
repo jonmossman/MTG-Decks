@@ -21,6 +21,7 @@ class CardData:
     name: str
     type_line: str | None = None
     color_identity: list[str] | None = None
+    cmc: float | None = None
     prices: dict[str, str] | None = None
 
 
@@ -49,6 +50,7 @@ class ScryfallResolver(CardResolver):
             name=payload.get("name", query),
             type_line=payload.get("type_line"),
             color_identity=payload.get("color_identity") or payload.get("colors"),
+            cmc=payload.get("cmc"),
             prices=payload.get("prices"),
         )
 
@@ -70,8 +72,18 @@ def parse_import_rows(text: str) -> list[tuple[int, str]]:
         if not row or not "".join(row).strip():
             continue
 
+        if _is_header_row(row):
+            continue
+
         if len(row) >= 2:
-            count_text, name = row[0].strip(), ",".join(row[1:]).strip()
+            first, remainder = row[0].strip(), [cell.strip() for cell in row[1:]]
+            if _looks_like_count(first):
+                count_text, name = first, ",".join(remainder).strip()
+            elif remainder and _looks_like_count(remainder[0]):
+                count_text, name = remainder[0], first
+            else:
+                line = ",".join(row).strip()
+                count_text, name = "1", line
         else:
             line = row[0].strip()
             parts = line.split(maxsplit=1)
@@ -104,6 +116,35 @@ def _looks_like_count(text: str) -> bool:
     if stripped.endswith("x"):
         stripped = stripped[:-1]
     return stripped.isdigit()
+
+
+def _is_header_row(row: list[str]) -> bool:
+    if len(row) < 2:
+        return False
+
+    normalized = [cell.strip().lower() for cell in row[:2]]
+    first, second = normalized[0], normalized[1]
+
+    count_headers = {"count", "qty", "quantity"}
+    name_headers = {"name", "card", "card name"}
+
+    header_first_is_count = first in count_headers
+    header_second_is_count = second in count_headers
+    header_first_is_name = first in name_headers
+    header_second_is_name = second in name_headers
+
+    if (header_first_is_count and header_second_is_name) or (
+        header_first_is_name and header_second_is_count
+    ):
+        return True
+
+    if header_second_is_name and not _looks_like_count(first):
+        return True
+
+    if header_first_is_name and not _looks_like_count(second):
+        return True
+
+    return False
 
 
 def import_deck(

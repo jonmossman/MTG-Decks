@@ -46,6 +46,8 @@ Created: 2024-06-21
 | `mtg-decks import <name> <commander> --cards <text> | --file <csv>` | Fuzzy-match card entries against Scryfall, generate a decklist, and write/update a Markdown file (use `--overwrite` to replace an existing file). |
 | `mtg-decks value <name-or-slug> [--currency GBP]` | Sum card prices via Scryfall price fields (`gbp`, `usd`, `eur`, etc.) and report missing values. |
 | `mtg-decks validate [--log validation.log] [--deck-size 100] [--ban CARD]...` | Validate deck files against Commander rules and optionally write a fresh log file on each run. |
+| `mtg-decks spares import --box <label> [--cards text | --file csv] [--sort name|value|cmc]` | Add spare cards to `spares.md`, tagging them with a storage box and pricing them. |
+| `mtg-decks spares search [--query text] [--box label] [--sort name|value|cmc]` | Filter and sort spare cards with live pricing so you can find the right box. |
 
 Add `--dir PATH` to any command to work against a different deck folder. Check the tool version with `mtg-decks --version`.
 
@@ -172,6 +174,24 @@ PYTHONPATH=src mtg-decks value-all --currency usd --report valuation-report.md
 ```
 Commit or archive each `valuation-report.md` snapshot so you can diff how deck prices move between runs.
 Use `--source` (or `MTG_DECKS_VALUATION_SOURCE`) to pick the price provider; `scryfall` is supported today.
+
+## Tracking spare cards and storage boxes
+Catalog extra cards alongside your decks to keep box locations and valuations in sync. The `spares` command writes a Markdown inventory (`spares.md` by default) and lets you search or sort it.
+
+Import cards from a CSV or pasted text while tagging the storage box:
+```bash
+mtg-decks spares import --box "Staples" --cards $'2 Sol Ring\n1 Arcane Signet'
+mtg-decks spares import --box "Cube Box" --file spares.csv --sort value
+```
+Each run merges counts with existing entries, prices the cards, and rewrites `spares.md` with a table that includes count, box, type line, converted mana cost, and both unit and total value.
+CSV rows can be `Count,Name` or `Name,Count`, and optional header rows (e.g., `Count,Name`) are ignored.
+
+Search the inventory with filters and sorting:
+```bash
+mtg-decks spares search --query artifact --sort value
+mtg-decks spares search --box "Staples" --box "Cube Box" --sort cmc
+```
+Search matches names, type lines, and box labels, and you can order results by name, total value, or CMC. Missing prices are called out so you know which cards need manual values.
 
 ### Configuring valuation defaults
 - `MTG_DECKS_CURRENCY`: default pricing currency (e.g., `USD`, `EUR`, `GBP`).
