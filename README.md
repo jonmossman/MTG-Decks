@@ -107,6 +107,7 @@ mtg-decks import "Uploaded Deck" "The Ur-Dragon" --cards $'2 sol rng\n1 arcane s
 ```
 Behavior and tips:
 - Accepts CSV rows (`quantity,name`) or newline-separated text (`2 Sol Ring`).
+- Handles common count suffixes like `2x Sol Ring` or `2X Sol Ring` in addition to bare numbers.
 - Uses Scryfall's fuzzy matcher to clean up names; falls back to your input when lookups fail.
 - Infers colors from the commander unless `--colors` is supplied.
 - You can enforce `CommanderRules` during import from Python:
