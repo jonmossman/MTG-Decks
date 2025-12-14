@@ -5,6 +5,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>MTG Decks &amp; Inventory</title>
   <style>
+    html {
+      scroll-behavior: smooth;
+    }
+
     :root {
       color-scheme: dark;
       --bg: #060608;
@@ -176,6 +180,13 @@
       letter-spacing: 0.2px;
     }
 
+    .section-title span {
+      color: var(--muted);
+      font-size: 0.95rem;
+      font-weight: 500;
+      margin-left: 6px;
+    }
+
     ul.feature-list {
       list-style: none;
       padding: 0;
@@ -190,6 +201,55 @@
       border-radius: 10px;
       padding: 10px 12px;
       color: var(--muted);
+    }
+
+    .doc-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 14px;
+      margin-top: 14px;
+    }
+
+    .doc-card {
+      background: linear-gradient(135deg, rgba(113, 201, 248, 0.08), rgba(10, 12, 18, 0.95));
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 16px;
+      box-shadow: var(--shadow);
+      display: grid;
+      gap: 10px;
+    }
+
+    .doc-card h3 {
+      margin: 0;
+      font-size: 1.05rem;
+    }
+
+    .doc-card p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 0.96rem;
+    }
+
+    .doc-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      color: var(--muted);
+      font-size: 0.92rem;
+    }
+
+    .doc-meta span {
+      background: #0b0d12;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 6px 10px;
+    }
+
+    .doc-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
     }
 
     .footer {
@@ -208,7 +268,8 @@
         <nav class="nav">
           <a class="button" href="decks.html">Browse Decks</a>
           <a class="button" href="inventory.html">Open Inventory</a>
-          <a class="button" href="#docs">Docs</a>
+          <a class="button" href="upload.html">Upload Guide</a>
+          <a class="button" href="#docs">Docs Hub</a>
         </nav>
       </div>
 
@@ -224,6 +285,7 @@
         <a class="button primary" href="decks.html">Deck Browser</a>
         <a class="button" href="inventory.html">Inventory Table</a>
         <a class="button" href="valuation-report.md">Valuation Report</a>
+        <a class="button" href="upload.html">Upload Guide</a>
         <a class="button" href="functional-spec.html">Functional Spec</a>
       </div>
 
@@ -266,6 +328,7 @@
         </div>
         <div class="nav">
           <a class="button" href="README.md">README</a>
+          <a class="button" href="upload.html">Upload Guide</a>
           <a class="button" href="functional-spec.html">Functional Spec</a>
           <a class="button" href="valuation-report.md">Valuation Report</a>
         </div>
@@ -279,6 +342,51 @@
       <li><strong>Share context.</strong> Link friends straight to specs, valuation reports, or notes with the buttons above.</li>
       <li><strong>Edit safely.</strong> Everything reads directly from the repo, so updating markdown files instantly updates the site.</li>
     </ul>
+
+    <section class="section-title" id="docs">
+      Docs &amp; guides
+      <span>Jump to the resource that matches what you're trying to do.</span>
+    </section>
+    <div class="doc-grid">
+      <article class="doc-card">
+        <h3>Upload Guide</h3>
+        <p>Step-by-step checklists for adding, amending, or removing deck files and keeping inventory tidy for GitHub Pages.</p>
+        <div class="doc-meta">
+          <span>Deck updates</span>
+          <span>Inventory hygiene</span>
+        </div>
+        <div class="doc-actions">
+          <a class="button primary" href="upload.html">Open guide</a>
+          <a class="button" href="README.md#github-pages-content">See overview</a>
+        </div>
+      </article>
+
+      <article class="doc-card">
+        <h3>Functional Spec</h3>
+        <p>Source of truth for the MTG viewer behaviors, including deck parsing expectations, keyboard shortcuts, and rendering details.</p>
+        <div class="doc-meta">
+          <span>Behavior reference</span>
+          <span>Keyboard support</span>
+        </div>
+        <div class="doc-actions">
+          <a class="button primary" href="functional-spec.html">Read spec</a>
+          <a class="button" href="FUNCTIONAL_SPEC.md">Edit markdown</a>
+        </div>
+      </article>
+
+      <article class="doc-card">
+        <h3>Inventory &amp; Valuation</h3>
+        <p>Browse the trade box table or pop open the valuation report without leaving the landing page.</p>
+        <div class="doc-meta">
+          <span>Inventory search</span>
+          <span>Price snapshot</span>
+        </div>
+        <div class="doc-actions">
+          <a class="button primary" href="inventory.html">Open inventory</a>
+          <a class="button" href="valuation-report.md">View valuation</a>
+        </div>
+      </article>
+    </div>
 
     <div class="footer">Built for GitHub Pages — optimized for dark mode, quick navigation, and markdown-first workflows.</div>
   </div>
