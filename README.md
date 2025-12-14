@@ -26,6 +26,24 @@ mtg-decks create "Bear Brigade" "Kudo, King Among Bears" --colors W G --theme "B
 mtg-decks import "Messy Deck" "Kudo, King Among Bears" --cards $'2 sol rng\n1 arcane signet'
 mtg-decks value "Tidus, Yuna's Guardian" --currency gbp
 ```
+
+## GitHub Pages viewer (plain text, dark theme)
+The repository includes a minimal Pages-friendly frontend so you can browse decks and inventory without leaving plain text. The
+HTML lives at the repository root:
+
+- `index.html`: links to decks, inventory, README, the functional spec, and valuation report.
+- `decks.html`: lists deck files and fetches their raw markdown.
+- `inventory.html`: loads `inventory.md` and adds search/sort/filter controls over the table.
+
+To publish on GitHub Pages:
+
+1. Push the repository to GitHub and enable Pages for the main branch.
+2. Keep the provided `.nojekyll` file so raw `.md` assets are served to the browser.
+3. Update the hard-coded deck list in `decks.html` to match your files by adjusting the `file` paths (e.g., `decks/<slug>.md`).
+4. Commit `inventory.md` so `inventory.html` can parse the table and populate the filters.
+
+Everything uses a black background, white text, and monospace fonts to stay readable as plain text. You can preview locally with
+`python -m http.server` from the repo root and opening `http://localhost:8000/index.html` in a browser.
 Typical `list` and `show` output:
 ```
 Tidus, Yuna's Guardian (W, U, B, R, G) :: Commander: Tidus, Yuna's Guardian

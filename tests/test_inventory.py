@@ -130,3 +130,32 @@ def test_inventory_search_filters_and_sorts(tmp_path: Path):
         currency="gbp", resolver=resolver, query="chant", boxes={"Binder"}
     )
     assert [entry.name for entry, _ in enchantments] == ["Mystic Remora"]
+
+
+def test_inventory_load_handles_missing_numbers(tmp_path: Path):
+    inventory_path = tmp_path / "spares.md"
+    inventory_path.write_text(
+        "\n".join(
+            [
+                "# Spare Card Inventory",
+                "",
+                "Currency: USD",
+                "",
+                "| Name | Count | Box | CMC | Type | Unit Value | Total Value |",
+                "| --- | --- | --- | --- | --- | --- | --- |",
+                "| Sol Ring | unknown | Staples | NaN | Artifact | Unknown | Unknown |",
+                "| Island | 5 | Bulk |  | Basic Land | Unknown | Unknown |",
+            ]
+        ),
+        encoding="utf-8",
+    )
+
+    inventory = SparesInventory(inventory_path)
+    loaded = inventory.load()
+
+    by_name = {entry.name: entry for entry in loaded}
+    assert by_name["Sol Ring"].count == 1
+    assert by_name["Sol Ring"].cmc is None
+    assert by_name["Island"].count == 5
+    assert by_name["Island"].cmc is None
+    assert by_name["Island"].type_line == "Basic Land"
