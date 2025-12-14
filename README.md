@@ -20,8 +20,8 @@ By default the CLI looks for decks in `./decks`. Point to another directory with
 ```bash
 mtg-decks list
 mtg-decks show "Tidus, Yuna's Guardian"
-mtg-decks create "Limit Break" "Cloud, Ex-SOLDIER" --colors W U B G --theme "Superfriends control"
-mtg-decks import "Messy Deck" "Cloud, Ex-SOLDIER" --cards $'2 sol rng\n1 arcane signet'
+mtg-decks create "Kudo Bears" "Kudo, King Among Bears" --colors W G --theme "Bear tribal tokens"
+mtg-decks import "Messy Deck" "Kudo, King Among Bears" --cards $'2 sol rng\n1 arcane signet'
 mtg-decks value "Tidus, Yuna's Guardian" --currency gbp
 ```
 Typical `list` and `show` output:
@@ -51,33 +51,33 @@ Add `--dir PATH` to any command to work against a different deck folder. Check t
 Decks use YAML-style front matter followed by Markdown content. A minimal example:
 ```markdown
 ---
-name: Limit Break
-commander: Cloud, Ex-SOLDIER
-colors: W, U, B, G
-theme: Superfriends control
+name: Kudo Bears
+commander: Kudo, King Among Bears
+colors: W, G
+theme: Bear tribal tokens and buffs
 format: Commander
-created: 2024-06-21
-notes: Lean into planeswalkers and proliferate engines.
+created: 2024-07-20
+notes: Flood the board with efficient bears and anthem effects.
 ---
 
-# Limit Break
+# Kudo Bears
 
-**Commander:** Cloud, Ex-SOLDIER
-**Theme:** Superfriends control
-**Colors:** W, U, B, G
+**Commander:** Kudo, King Among Bears
+**Theme:** Bear tribal tokens and buffs
+**Colors:** W, G
 **Format:** Commander
 
 ## Decklist
-- [Commander] Cloud, Ex-SOLDIER
-- Teferi, Temporal Archmage
-- Oko, Thief of Crowns
-- Smothering Tithe
-- Doubling Season
+- [Commander] Kudo, King Among Bears
+- Ayula, Queen Among Bears
+- Bearscape
+- Guardian Project
+- Kodama's Reach
 ```
 
 ### Filenames and slugs
-- Filenames are derived from deck names (e.g., `"Limit Break"` → `limit-break.md`).
-- Use names or slugs interchangeably with the CLI (`mtg-decks show limit-break`).
+- Filenames are derived from deck names (e.g., `"Kudo Bears"` → `kudo-bears.md`).
+- Use names or slugs interchangeably with the CLI (`mtg-decks show kudo-bears`).
 
 ## Validation and rules
 Use `CommanderRules` to enforce construction rules such as 100 cards, singleton enforcement, mandatory commander tags, and banned cards.
