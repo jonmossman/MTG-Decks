@@ -3,3 +3,4 @@ __pycache__/
 .venv/
 .env
 valuation-cache.json
+error.log
