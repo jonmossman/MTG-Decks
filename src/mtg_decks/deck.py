@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from dataclasses import dataclass, field
+from dataclasses import asdict, dataclass, field
 from pathlib import Path
 from typing import Optional
 
@@ -21,7 +21,12 @@ class Deck:
 
     FRONT_MATTER_MARK = "---"
 
-    def to_markdown(self) -> str:
+    def to_markdown(
+        self,
+        *,
+        body_template: str | None = None,
+        decklist_lines: list[str] | None = None,
+    ) -> str:
         front_matter = [self.FRONT_MATTER_MARK]
         front_matter.append(f"name: {self.name}")
         front_matter.append(f"commander: {self.commander}")
@@ -39,15 +44,7 @@ class Deck:
             front_matter.append(f"notes: {self.notes}")
         front_matter.append(self.FRONT_MATTER_MARK)
 
-        body = [f"# {self.name}"]
-        body.append(f"**Commander:** {self.commander}")
-        if self.theme:
-            body.append(f"**Theme:** {self.theme}")
-        if self.colors:
-            body.append(f"**Colors:** {', '.join(self.colors)}")
-        body.append("\n## Decklist\n")
-        body.append(f"- [Commander] {self.commander}")
-        body.append("- ... add the rest of your cards here ...")
+        body = _build_body(self, body_template, decklist_lines=decklist_lines)
 
         return "\n".join(front_matter + ["\n"] + body) + "\n"
 
@@ -57,13 +54,25 @@ class Deck:
         metadata: dict[str, str] = {}
 
         if lines and lines[0].strip() == cls.FRONT_MATTER_MARK:
+            closing_idx = None
             for idx in range(1, len(lines)):
                 line = lines[idx].strip()
                 if line == cls.FRONT_MATTER_MARK:
+                    closing_idx = idx
                     break
-                if line and ":" in line:
-                    key, value = line.split(":", 1)
-                    metadata[key.strip()] = value.strip()
+                if not line:
+                    continue
+                if ":" not in line:
+                    raise ValueError(
+                        f"Invalid front matter line in {path}: '{lines[idx]}'"
+                    )
+                key, value = line.split(":", 1)
+                metadata[key.strip()] = value.strip()
+            if closing_idx is None:
+                raise ValueError(f"Front matter not terminated in {path}")
+
+        if lines and lines[0].strip() == cls.FRONT_MATTER_MARK and "commander" not in metadata:
+            raise ValueError(f"Front matter missing required field 'commander' in {path}")
 
         name = metadata.get("name") or path.stem.replace("-", " ")
         commander = metadata.get("commander", "Unknown")
@@ -91,6 +100,50 @@ def _split_csv(value: str) -> list[str]:
     if not value:
         return []
     return [part.strip() for part in value.split(",") if part.strip()]
+
+
+def _build_body(
+    deck: Deck, body_template: str | None, decklist_lines: list[str] | None
+) -> list[str]:
+    if body_template:
+        template_data = _DeckTemplateDefaults(**asdict(deck))
+        template_data["colors"] = ", ".join(deck.colors)
+        rendered = body_template.format_map(template_data).rstrip()
+        body_lines = rendered.splitlines()
+    else:
+        body_lines = [f"# {deck.name}"]
+        body_lines.append(f"**Commander:** {deck.commander}")
+        if deck.theme:
+            body_lines.append(f"**Theme:** {deck.theme}")
+        if deck.colors:
+            body_lines.append(f"**Colors:** {', '.join(deck.colors)}")
+        if deck.format:
+            body_lines.append(f"**Format:** {deck.format}")
+        if deck.created:
+            body_lines.append(f"**Created:** {deck.created}")
+        if deck.updated:
+            body_lines.append(f"**Updated:** {deck.updated}")
+        if deck.notes:
+            body_lines.append("")
+            body_lines.append("## Notes")
+            body_lines.append(deck.notes)
+
+    body_lines.append("")
+    body_lines.append("## Decklist")
+    body_lines.append("")
+
+    if decklist_lines is not None:
+        body_lines.extend(decklist_lines)
+    else:
+        body_lines.append(f"- [Commander] {deck.commander}")
+        body_lines.append("- ... add the rest of your cards here ...")
+
+    return body_lines
+
+
+class _DeckTemplateDefaults(dict):
+    def __missing__(self, key: str) -> str:  # pragma: no cover - defensive
+        return ""
 
 
 def slugify(text: str) -> str:
