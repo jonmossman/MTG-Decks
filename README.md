@@ -20,6 +20,18 @@ A tiny Python-powered library for storing and reviewing your Commander decks as 
    mtg-decks create "Atraxa Superfriends" "Atraxa, Praetors' Voice" --colors W U B G --theme "Superfriends control"
    ```
 
+## Working with git remotes
+This repository does not include a default `origin` remote. If you want to fetch or push
+to your own remote, add one first:
+
+```bash
+git remote add origin <your-repo-url>
+git fetch origin
+```
+
+Replace `<your-repo-url>` with the HTTPS or SSH URL for your Git host. Once the remote is
+configured, regular `git fetch`, `git pull`, and `git push` commands will work as expected.
+
 ## Deck file layout
 Decks are regular Markdown files with a YAML-style front matter block. For example:
 
