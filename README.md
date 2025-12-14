@@ -97,7 +97,6 @@ errors = library.validate_decks(
 Notes:
 - Logs are overwritten on every run so you always see the latest results.
 - Validation parses the `## Decklist` section and flags wrong counts, duplicate non-basics, banned cards, or missing commanders.
-- Run the same checks from the CLI with optional overrides: `mtg-decks validate --deck-size 3 --max-commanders 2 --ban "Black Lotus" --log validation.log`
 
 ## Importing rough decklists
 Quickly bootstrap decks from messy sources by letting the importer normalize entries:
